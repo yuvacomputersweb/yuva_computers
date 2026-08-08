@@ -323,21 +323,48 @@ export default function ProfilePage() {
                             </div>
                           </div>
 
-                          {/* Price breakdown */}
+                          {/* Order summary */}
                           <div className="bg-muted/20 rounded-xl p-4 space-y-2">
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Price Breakdown</p>
-                            {[
-                              { label: 'Subtotal', value: `₹${Number(order.subtotal).toLocaleString('en-IN')}` },
-                              Number(order.discount_amount) > 0 && { label: 'Discount', value: `−₹${Number(order.discount_amount).toLocaleString('en-IN')}`, green: true },
-                              { label: 'Shipping', value: Number(order.shipping_fee) === 0 ? 'FREE' : `₹${Number(order.shipping_fee).toLocaleString('en-IN')}` },
-                              Number(order.cod_fee) > 0 && { label: `COD Fee`, value: `₹${Number(order.cod_fee).toFixed(0)}` },
-                              Number(order.tax_amount) > 0 && { label: 'Tax', value: `₹${Number(order.tax_amount).toFixed(0)}` },
-                            ].filter(Boolean).map((row: any) => (
-                              <div key={row.label} className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">{row.label}</span>
-                                <span className={`font-medium ${row.green ? 'text-success' : 'text-foreground'}`}>{row.value}</span>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Order Summary</p>
+
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Product Subtotal</span>
+                              <span className="font-medium text-foreground">₹{Number(order.subtotal).toLocaleString('en-IN')}</span>
+                            </div>
+
+                            {Number(order.discount_amount) > 0 && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Discount</span>
+                                <span className="font-medium text-success">−₹{Number(order.discount_amount).toLocaleString('en-IN')}</span>
                               </div>
-                            ))}
+                            )}
+
+                            {Number(order.tax_amount) > 0 && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">GST / Tax</span>
+                                <span className="font-medium text-foreground">₹{Number(order.tax_amount).toLocaleString('en-IN')}</span>
+                              </div>
+                            )}
+
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Shipping Fee</span>
+                              <span className="font-medium text-foreground">{Number(order.shipping_fee) === 0 ? 'FREE' : `₹${Number(order.shipping_fee).toLocaleString('en-IN')}`}</span>
+                            </div>
+
+                            {order.is_partial_cod && Number(order.payment_summary?.cod_upfront_charge) > 0 && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">COD Processing Fee (2%)</span>
+                                <span className="font-medium text-foreground">₹{Number(order.payment_summary.cod_upfront_charge).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              </div>
+                            )}
+
+                            {order.is_partial_cod && Number(order.payment_summary?.cod_upfront_gst) > 0 && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">GST on COD Fee (18%)</span>
+                                <span className="font-medium text-foreground">₹{Number(order.payment_summary.cod_upfront_gst).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              </div>
+                            )}
+
                             {order.coupon_code && (
                               <p className="text-xs text-muted-foreground">Coupon: <span className="font-mono font-bold">{order.coupon_code}</span></p>
                             )}
@@ -346,11 +373,52 @@ export default function ProfilePage() {
                                 <Gift className="w-3 h-3" /> Exchange code: <span className="font-mono font-bold">{order.exchange_code_used}</span>
                               </p>
                             )}
+
                             <div className="flex justify-between pt-2 border-t border-border/20">
-                              <span className="font-bold text-foreground text-sm">Total Paid</span>
-                              <span className="font-bold text-foreground text-sm">₹{Number(order.total_amount).toLocaleString('en-IN')}</span>
+                              <span className="font-bold text-foreground text-sm">Grand Total Order Value</span>
+                              <span className="font-bold text-foreground text-sm">₹{(
+                                Number(order.total_amount) +
+                                (order.is_partial_cod ? Number(order.payment_summary?.paid_online ?? 0) : 0)
+                              ).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </div>
                           </div>
+
+                          {/* Payment breakdown */}
+                          {order.is_partial_cod ? (
+                            <div className="space-y-3">
+                              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex justify-between text-sm items-center">
+                                <span className="text-muted-foreground flex items-center gap-1.5">
+                                  Paid Online Now <span className="text-green-700 font-semibold">(COD Fee + GST)</span>
+                                  {order.payment_summary?.deposit_confirmed && <CheckCircle className="w-3.5 h-3.5 text-green-600" />}
+                                </span>
+                                <span className="font-bold text-green-700">₹{Number(order.payment_summary?.paid_online ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              </div>
+
+                              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex justify-between text-sm items-center">
+                                <span className="text-muted-foreground">
+                                  Due on Delivery <span className="text-yellow-700 font-semibold">(Product Price)</span>
+                                </span>
+                                <span className="font-bold text-yellow-700">₹{Number(order.payment_summary?.payable_at_delivery ?? 0).toLocaleString('en-IN')}</span>
+                              </div>
+
+                              <p className="text-xs text-muted-foreground leading-relaxed px-1">
+                                The ₹{Number(order.payment_summary?.paid_online ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })} paid online covers a 2% COD processing fee plus 18% GST on that fee. Only the base product price of ₹{Number(order.payment_summary?.payable_at_delivery ?? 0).toLocaleString('en-IN')} is collected at the door.
+                              </p>
+
+                              {!order.payment_summary?.deposit_confirmed && (
+                                <p className="text-xs text-yellow-700 flex items-center gap-1">
+                                  <AlertCircle className="w-3 h-3" /> Online fee not yet paid. Order confirms once it's received.
+                                </p>
+                              )}
+                            </div>
+                          ) : order.payment_summary?.deposit_confirmed ? (
+                            <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex justify-between text-sm items-center">
+                              <span className="text-muted-foreground flex items-center gap-1.5">
+                                Total Paid Online <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                              </span>
+                              <span className="font-bold text-green-700">₹{Number(order.payment_summary.paid_online).toLocaleString('en-IN')}</span>
+                            </div>
+                          ) : null}
 
                           {/* Shipping address */}
                           <div>
