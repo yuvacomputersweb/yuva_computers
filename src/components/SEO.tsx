@@ -26,14 +26,13 @@ export const SEO: React.FC<SEOProps> = ({
   noindex = false,
   jsonLd,
 }) => {
-  // Prevent any title string containing "undefined" from rendering
   const safeTitle =
     title && !title.includes("undefined") ? title : DEFAULT_TITLE;
 
   const currentUrl = canonical ? `${DOMAIN}${canonical}` : DOMAIN;
 
   return (
-    <Helmet>
+    <Helmet prioritizeSeoTags>
       <title>{safeTitle}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={currentUrl} />

@@ -46,15 +46,29 @@ export default function ProductDetailPage() {
   if (!product) return null;
 
   // Safe evaluations after product loading is confirmed
-  const productName = product.name || "Refurbished Product";
+  const productName = product.name || product.title || product.product_name || "Refurbished Laptop";
   const currentPrice = activeVariant?.final_price || product.price || 0;
   const productImage =
     product.primary_image ||
     (product.images && product.images[0]?.image) ||
     "https://www.yuvacomputers.in/favicon-32x32.png";
-  const cleanDescription = (product.description || "")
-    .substring(0, 160)
-    .replace(/\n/g, " ");
+
+  // Strip HTML and clean whitespace
+  const strippedText = (product.description || product.short_description || "")
+    .replace(/<[^>]*>?/gm, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Create description from text, highlights, or hardware specs
+  let metaDescription = "";
+  if (strippedText.length > 10) {
+    metaDescription = strippedText.substring(0, 155) + "...";
+  } else if (Array.isArray(product.highlights_list) && product.highlights_list.length > 0) {
+    metaDescription = product.highlights_list.join(", ").substring(0, 155);
+  } else {
+    const specParts = [product.processor, product.ram, product.storage].filter(Boolean).join(" / ");
+    metaDescription = `Buy certified refurbished ${productName}${specParts ? ` (${specParts})` : ""} at Yuva Computers with warranty and fast shipping.`;
+  }
 
   const productSchema = [
     {
@@ -62,7 +76,7 @@ export default function ProductDetailPage() {
       "@type": "Product",
       "name": productName,
       "image": productImage,
-      "description": cleanDescription,
+      "description": metaDescription,
       "brand": {
         "@type": "Brand",
         "name": product.brand_name || "Yuva Computers",
@@ -108,10 +122,7 @@ export default function ProductDetailPage() {
     <>
       <SEO
         title={`${productName} | Yuva Computers`}
-        description={
-          cleanDescription ||
-          `Buy ${productName} at the best price with warranty at Yuva Computers.`
-        }
+        description={metaDescription}
         canonical={`/product/${slug}`}
         ogType="product"
         ogImage={productImage}
@@ -124,7 +135,7 @@ export default function ProductDetailPage() {
             <ProductInfo product={product} onVariantChange={setActiveVariant} />
             <TrustBadges product={product} />
 
-            {/* Mobile Description Block (Matches Tab UI) */}
+            {/* Mobile Description Block */}
             <div className="lg:hidden space-y-8 pt-4">
               <div className="prose max-w-none text-muted-foreground">
                 <h4 className="font-bold text-foreground flex items-center gap-2 mb-2 text-sm">
