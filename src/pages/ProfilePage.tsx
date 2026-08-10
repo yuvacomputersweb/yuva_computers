@@ -10,6 +10,7 @@ import {
   ChevronLeft, ChevronRight, Gift,
 } from 'lucide-react';
 import AddressManager from '@/components/profile/AddressManager';
+import { SEO } from "@/components/SEO";
 
 type Tab = 'profile' | 'orders' | 'addresses';
 
@@ -132,6 +133,8 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
+    <>
+    <SEO title="My Account & Orders | Yuva Computers" noindex={true} />
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 md:px-6 py-10 max-w-4xl">
 
@@ -605,5 +608,6 @@ export default function ProfilePage() {
         </div>
       )}
     </div>
+    </>
   );
 }

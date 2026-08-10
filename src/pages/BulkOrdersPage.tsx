@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Truck, Settings, Shield, CheckCircle, Loader2, Star, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { submitBulkOrder, contentService } from "@/services/api";
+import { SEO } from "@/components/SEO";
 
 const ICON_MAP: Record<string, any> = {
   truck: Truck, settings: Settings, shield: Shield,
@@ -31,7 +32,6 @@ type FormState = {
 };
 
 const BulkOrdersPage = () => {
-  
   const [form, setForm] = useState<FormState>({
     name: "", company: "", email: "", phone: "",
     deviceType: "Laptops", deviceTypeOther: "", quantity: "", requirements: "",
@@ -40,22 +40,22 @@ const BulkOrdersPage = () => {
   const [phoneError, setPhoneError] = useState("");
   const [pageContent, setPageContent] = useState<any>(null);
 
-const [scalePoints, setScalePoints] = useState<string[]>([
-  "Priority PAN-India Logistics",
-  "Bulk Discount Pricing Tiers",
-  "Full GST Compliance Support",
-]);
-  useEffect(() => {
-  contentService.getBulkOrderContent()
-    .then(data => {
-      setPageContent(data);
+  const [scalePoints, setScalePoints] = useState<string[]>([
+    "Priority PAN-India Logistics",
+    "Bulk Discount Pricing Tiers",
+    "Full GST Compliance Support",
+  ]);
 
-      if (data.scale_points?.length > 0) {
-        setScalePoints(data.scale_points.map((p: any) => p.text));
-      }
-    })
-    .catch(console.error);
-}, []);
+  useEffect(() => {
+    contentService.getBulkOrderContent()
+      .then(data => {
+        setPageContent(data);
+        if (data.scale_points?.length > 0) {
+          setScalePoints(data.scale_points.map((p: any) => p.text));
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const c = pageContent?.content || {};
   const benefits = pageContent?.benefits?.length > 0 ? pageContent.benefits : DEFAULT_BENEFITS;
@@ -120,6 +120,12 @@ const [scalePoints, setScalePoints] = useState<string[]>([
 
   return (
     <>
+      <SEO
+        title="Corporate Bulk Orders & Enterprise IT | Yuva Computers"
+        description="Equip your office with refurbished workstations, mini PCs, and desktops. Get custom corporate pricing, GST invoices, and dedicated support."
+        canonical="/bulk-orders"
+      />
+
       {/* Hero */}
       <section className="relative overflow-hidden min-h-[400px]">
         {heroImage ? (
@@ -178,10 +184,10 @@ const [scalePoints, setScalePoints] = useState<string[]>([
               <p className="text-muted-foreground mt-4 leading-relaxed">{sectionText}</p>
               <ul className="mt-6 space-y-3">
                 {scalePoints.map((item) => (
-  <li key={item} className="flex items-center gap-3 text-sm text-foreground">
-    <CheckCircle className="w-4 h-4 text-success" /> {item}
-  </li>
-))}
+                  <li key={item} className="flex items-center gap-3 text-sm text-foreground">
+                    <CheckCircle className="w-4 h-4 text-success" /> {item}
+                  </li>
+                ))}
               </ul>
             </div>
 

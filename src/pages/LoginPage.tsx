@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { SEO } from "@/components/SEO";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -76,6 +77,8 @@ export default function LoginPage() {
   };
 
   return (
+    <>
+    <SEO title="Account Sign In | Yuva Computers" noindex={true} />
     <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4">
       <div className="max-w-md w-full bg-card border border-border rounded-2xl shadow-ambient p-8 md:p-10 space-y-8">
 
@@ -234,6 +237,7 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+    </>
   );
 }
 

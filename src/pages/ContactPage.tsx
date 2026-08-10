@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Phone, MessageCircle, Mail, MapPin, Clock, AlertTriangle, Wrench, ShoppingCart, MessageSquare, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { submitContactForm, submitComplaint, contentService } from "@/services/api";
+import { SEO } from "@/components/SEO";
 
 const ICON_MAP: Record<string, any> = {
   wrench: Wrench,
@@ -61,7 +62,6 @@ const ContactPage = () => {
   const [pageContent, setPageContent] = useState<any>(DEFAULT_CONTENT);
   const [departments, setDepartments] = useState<any[]>(DEFAULT_DEPARTMENTS);
 
-  // Contact form
   const [form, setForm] = useState({
     name: "", email: "", phone: "", orderId: "",
     issueType: "Technical Assistance", issueTypeOther: "", message: "",
@@ -69,7 +69,6 @@ const ContactPage = () => {
   const [formPhoneError, setFormPhoneError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
 
-  // Complaint form
   const [complaint, setComplaint] = useState({
     name: "", orderId: "", issueType: "Product Quality", issueTypeOther: "",
     description: "", email: "", phone: "",
@@ -143,8 +142,33 @@ const ContactPage = () => {
   const surfaceInputCls = "w-full mt-1.5 bg-surface-low rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body";
   const labelCls = "text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider";
 
+  const contactSchema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Yuva Computers - Dilshuknagar Main Branch",
+    "image": "https://www.yuvacomputers.in/favicon-32x32.png",
+    "telephone": "+919709888456",
+    "email": c.email_support,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Metro Pillar No. 1519, Sai Towers, 204, 2nd Floor, Dilsukhnagar",
+      "addressLocality": "Hyderabad",
+      "addressRegion": "Telangana",
+      "postalCode": "500060",
+      "addressCountry": "IN"
+    },
+    "url": "https://www.yuvacomputers.in/contact"
+  };
+
   return (
     <>
+      <SEO
+        title="Contact Us & Customer Support | Yuva Computers"
+        description="Get technical support, sales assistance, or visit Yuva Computers Dilshuknagar branch. Phone, WhatsApp, and service desk contact information."
+        canonical="/contact"
+        jsonLd={contactSchema}
+      />
+
       {/* Hero */}
       <section className="py-16 lg:py-24 bg-surface-low">
         <div className="container mx-auto px-6">
@@ -162,7 +186,6 @@ const ContactPage = () => {
 
             {/* Left: contact info */}
             <div className="space-y-8">
-              {/* Department numbers */}
               <div className="space-y-5">
                 {departments.map((dept: any) => {
                   const Icon = ICON_MAP[dept.icon] || Phone;
@@ -172,14 +195,14 @@ const ContactPage = () => {
                         <Icon className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-  <h3 className="font-display font-bold text-foreground">{dept.label}</h3>
-  <a
-    href={`tel:${dept.number.replace(/\s/g, "")}`}
-    className="text-primary font-display font-semibold text-lg mt-0.5 block"
-  >
-    {dept.number}
-  </a>
-</div>
+                        <h3 className="font-display font-bold text-foreground">{dept.label}</h3>
+                        <a
+                          href={`tel:${dept.number.replace(/\s/g, "")}`}
+                          className="text-primary font-display font-semibold text-lg mt-0.5 block"
+                        >
+                          {dept.number}
+                        </a>
+                      </div>
                     </div>
                   );
                 })}
@@ -193,12 +216,12 @@ const ContactPage = () => {
                 <div>
                   <h3 className="font-display font-bold text-foreground">WhatsApp</h3>
                   <p className="text-sm text-muted-foreground">Instant technical guidance.</p>
-<a
-  href={`https://wa.me/${c.whatsapp_number}`}
-  className="text-primary font-display font-semibold text-sm mt-1 inline-flex items-center gap-1"
->
-  Start Chat →
-</a>
+                  <a
+                    href={`https://wa.me/${c.whatsapp_number}`}
+                    className="text-primary font-display font-semibold text-sm mt-1 inline-flex items-center gap-1"
+                  >
+                    Start Chat →
+                  </a>
                 </div>
               </div>
 
@@ -378,14 +401,14 @@ const ContactPage = () => {
                 </div>
               </div>
               
-                <a
-  href={c.branch_maps_url}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-block mt-6 gradient-primary text-primary-foreground px-6 py-2.5 rounded-lg font-display font-semibold text-sm hover:opacity-90 transition-opacity"
->
-  Get Directions
-</a>
+              <a
+                href={c.branch_maps_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-6 gradient-primary text-primary-foreground px-6 py-2.5 rounded-lg font-display font-semibold text-sm hover:opacity-90 transition-opacity"
+              >
+                Get Directions
+              </a>
             </div>
 
             <div className="bg-surface-high rounded-xl overflow-hidden aspect-[4/3] shadow-ambient">

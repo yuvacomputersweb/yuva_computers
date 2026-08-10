@@ -1,12 +1,10 @@
-//products page
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Loader2, X, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { storeService } from "@/services/api";
 import HorizontalProductCard from "@/components/home/HorizontalProductCard";
 import { type ApiProduct, collectVariantValues } from "@/types/product";
-
-// ── Collapsible filter section ────────────────────────────────────────────────
+import { SEO } from "@/components/SEO";
 
 function FilterSection({
   title,
@@ -49,8 +47,6 @@ function FilterSection({
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
-
 const ProductsPage = () => {
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<ApiProduct[]>([]);
@@ -62,32 +58,25 @@ const ProductsPage = () => {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [sortBy, setSortBy] = useState("newest");
 
-  // ── Fetch ───────────────────────────────────────────────────────────────
-  // ── Fetch ───────────────────────────────────────────────────────────────
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // 1. Convert search params to a mutable plain object
         const paramsObj = Object.fromEntries(searchParams);
 
-        // 2. FIX: If the user came from a Google organic sitelink, strip out the forced best-seller filter
         if (paramsObj.srsltid) {
-          delete paramsObj.srsltid; // Remove Google's tracking ID
+          delete paramsObj.srsltid;
           
           if (paramsObj.is_best_seller === 'true') {
-            delete paramsObj.is_best_seller; // Remove the forced filter so all 20 products load
+            delete paramsObj.is_best_seller;
           }
         }
 
-        // 3. Request cleaner data mapping from Django backend views
         const data = await storeService.getProducts(paramsObj);
         const prodList: ApiProduct[] = Array.isArray(data) ? data : data.products || [];
         setProducts(prodList);
 
         if (prodList.length > 0) {
-          // Price bounds come from the cheapest variant per product, not product.price,
-          // to stay consistent with what getCardPrice() shows on the cards.
           const prices = prodList.map((p) => {
             const variants = p.variants || [];
             if (variants.length > 0) {
@@ -108,7 +97,6 @@ const ProductsPage = () => {
     setSelectedFilters({});
   }, [searchParams]);
 
-  // ── Page title ──────────────────────────────────────────────────────────
   const pageTitle = useMemo(() => {
     if (searchParams.get("search")) return `Search: "${searchParams.get("search")}"`;
     if (searchParams.get("brand"))
@@ -118,11 +106,6 @@ const ProductsPage = () => {
     return "All Products";
   }, [searchParams]);
 
-  // ── Available filter options ─────────────────────────────────────────────
-  // ALL spec-level filters (Processor/RAM/Storage) are derived exclusively
-  // from product.variants[] via collectVariantValues().
-  // Product-level fields (product.processor, product.ram, product.storage)
-  // are never read here.
   const availableFilters = useMemo(() => {
     const filters: Record<string, string[]> = {};
 
@@ -145,8 +128,6 @@ const ProductsPage = () => {
       if (cats.length > 1) filters["Category"] = cats;
     }
 
-    // Variant-derived filters — only populated when variant data is present.
-    // collectVariantValues() reads variants[].processor/ram/storage exclusively.
     const processors = collectVariantValues(products, "processor");
     if (processors.length > 0) filters["Processor"] = processors;
 
@@ -159,7 +140,6 @@ const ProductsPage = () => {
     return filters;
   }, [products, searchParams]);
 
-  // ── Filter + sort ────────────────────────────────────────────────────────
   const filteredAndSorted = useMemo(() => {
     const activeProcessors = selectedFilters["Processor"] || [];
     const activeRams = selectedFilters["RAM"] || [];
@@ -168,8 +148,6 @@ const ProductsPage = () => {
       activeProcessors.length > 0 || activeRams.length > 0 || activeStorages.length > 0;
 
     let result = products.filter((p) => {
-      // ── Price filter ──────────────────────────────────────────────────
-      // Compare against cheapest variant price (same source as card display)
       const variants = p.variants || [];
       const cardPrice =
         variants.length > 0
@@ -177,7 +155,6 @@ const ProductsPage = () => {
           : Number(p.price);
       if (cardPrice > priceRange || cardPrice < priceBounds.min) return false;
 
-      // ── Product-level filters ─────────────────────────────────────────
       if (
         selectedFilters["Brand"]?.length &&
         !selectedFilters["Brand"].includes(p.brand_name)
@@ -194,10 +171,6 @@ const ProductsPage = () => {
       )
         return false;
 
-      // ── Variant-level filters ─────────────────────────────────────────
-      // A product passes if at least ONE variant satisfies ALL active
-      // variant dimensions simultaneously.
-      // Source: variants[] only — no product.processor/ram/storage touched.
       if (hasVariantFilter) {
         const matchesVariant = variants.some((v) => {
           const okProc =
@@ -254,7 +227,6 @@ const ProductsPage = () => {
 
   const activeFilterCount = Object.values(selectedFilters).flat().length;
 
-  // ── Sidebar ──────────────────────────────────────────────────────────────
   const SidebarContent = () => (
     <div className="space-y-6">
       <div>
@@ -293,100 +265,125 @@ const ProductsPage = () => {
     </div>
   );
 
+  const cleanTitle = String(pageTitle).replace(/-/g, " ");
+  
+  const productsBreadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.yuvacomputers.in/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": cleanTitle,
+        "item": "https://www.yuvacomputers.in/products"
+      }
+    ]
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 capitalize">
-        {String(pageTitle).replace(/-/g, " ")}
-      </h1>
+    <>
+      <SEO
+        title={`${cleanTitle} | Yuva Computers`}
+        description={`Browse our store collection of ${cleanTitle}. High quality tested refurbished laptops, desktops, and accessories at low prices.`}
+        canonical="/products"
+        jsonLd={productsBreadcrumbSchema}
+      />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 capitalize">
+          {cleanTitle}
+        </h1>
 
-      {/* Top bar */}
-      <div className="flex justify-between items-center mb-8 bg-muted/40 p-4 rounded-lg">
-        <button
-          onClick={() => setMobileFiltersOpen(true)}
-          className="flex items-center gap-2 lg:hidden font-bold text-sm"
-        >
-          <Filter size={16} />
-          Filters
-          {activeFilterCount > 0 && (
-            <span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {activeFilterCount}
-            </span>
-          )}
-        </button>
-        <div className="hidden lg:block font-medium text-sm text-muted-foreground">
-          {filteredAndSorted.length} Products
+        <div className="flex justify-between items-center mb-8 bg-muted/40 p-4 rounded-lg">
+          <button
+            onClick={() => setMobileFiltersOpen(true)}
+            className="flex items-center gap-2 lg:hidden font-bold text-sm"
+          >
+            <Filter size={16} />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+          <div className="hidden lg:block font-medium text-sm text-muted-foreground">
+            {filteredAndSorted.length} Products
+          </div>
+          <select
+            onChange={(e) => setSortBy(e.target.value)}
+            value={sortBy}
+            className="bg-transparent font-bold text-sm outline-none cursor-pointer"
+          >
+            <option value="newest">Sort: Newest First</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+          </select>
         </div>
-        <select
-          onChange={(e) => setSortBy(e.target.value)}
-          value={sortBy}
-          className="bg-transparent font-bold text-sm outline-none cursor-pointer"
-        >
-          <option value="newest">Sort: Newest First</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-        </select>
-      </div>
 
-      <div className="flex gap-8">
-        {/* Desktop sidebar */}
-        <aside className="hidden lg:block lg:w-64 shrink-0">
-          <SidebarContent />
-        </aside>
+        <div className="flex gap-8">
+          <aside className="hidden lg:block lg:w-64 shrink-0">
+            <SidebarContent />
+          </aside>
 
-        {/* Mobile filter drawer */}
-        {mobileFiltersOpen && (
-          <>
-            <div
-              className="fixed inset-0 bg-black/40 z-40"
-              onClick={() => setMobileFiltersOpen(false)}
-            />
-            <div className="fixed inset-y-0 left-0 z-50 w-72 bg-background shadow-2xl p-6 overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-bold text-lg">Filters</h2>
-                <button onClick={() => setMobileFiltersOpen(false)}>
-                  <X size={20} />
+          {mobileFiltersOpen && (
+            <>
+              <div
+                className="fixed inset-0 bg-black/40 z-40"
+                onClick={() => setMobileFiltersOpen(false)}
+              />
+              <div className="fixed inset-y-0 left-0 z-50 w-72 bg-background shadow-2xl p-6 overflow-y-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="font-bold text-lg">Filters</h2>
+                  <button onClick={() => setMobileFiltersOpen(false)}>
+                    <X size={20} />
+                  </button>
+                </div>
+                <SidebarContent />
+                <button
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="mt-6 w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold text-sm"
+                >
+                  Show {filteredAndSorted.length} Results
                 </button>
               </div>
-              <SidebarContent />
-              <button
-                onClick={() => setMobileFiltersOpen(false)}
-                className="mt-6 w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold text-sm"
-              >
-                Show {filteredAndSorted.length} Results
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* Product grid */}
-        <main className="flex-1 min-w-0">
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <Loader2 className="animate-spin w-10 h-10" />
-            </div>
-          ) : filteredAndSorted.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredAndSorted.map((p) => (
-                <HorizontalProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          ) : (
-            <div className="py-20 text-center text-muted-foreground">
-              <p className="font-semibold mb-2">No products found</p>
-              <p className="text-sm">Try adjusting or clearing your filters.</p>
-              {activeFilterCount > 0 && (
-                <button
-                  onClick={() => setSelectedFilters({})}
-                  className="mt-4 text-primary font-semibold text-sm hover:underline"
-                >
-                  Clear all filters
-                </button>
-              )}
-            </div>
+            </>
           )}
-        </main>
+
+          <main className="flex-1 min-w-0">
+            {loading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="animate-spin w-10 h-10" />
+              </div>
+            ) : filteredAndSorted.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredAndSorted.map((p) => (
+                  <HorizontalProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            ) : (
+              <div className="py-20 text-center text-muted-foreground">
+                <p className="font-semibold mb-2">No products found</p>
+                <p className="text-sm">Try adjusting or clearing your filters.</p>
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={() => setSelectedFilters({})}
+                    className="mt-4 text-primary font-semibold text-sm hover:underline"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+              </div>
+            )}
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

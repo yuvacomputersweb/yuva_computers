@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { orderService, storeService } from "@/services/api";
 import { toast } from "sonner";
 import AddressManager from "@/components/profile/AddressManager";
+import { SEO } from "@/components/SEO";
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
@@ -337,6 +338,8 @@ export default function CheckoutPage() {
   const isCOD = paymentMethod === "COD";
 
   return (
+    <>
+    import { SEO } from "@/components/SEO";
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 md:px-6 py-4 md:py-8">
         <h1 className="font-display font-extrabold text-2xl md:text-3xl text-foreground mb-8">
@@ -684,5 +687,6 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

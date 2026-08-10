@@ -2,6 +2,7 @@ import { Globe, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { contentService } from "@/services/api";
+import { SEO } from "@/components/SEO";
 
 const DEFAULT_TIMELINE = [
   { year: "2009", title: "Founding", description: "Started with a simple belief: high-end technology shouldn't be a luxury. It should be a standard." },
@@ -32,8 +33,45 @@ const CompanyPage = () => {
     { name: "APPLE" }, { name: "ASUS" }, { name: "ACER" },
   ];
 
+  const companySchema = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Yuva Computers",
+      "url": "https://www.yuvacomputers.in/company",
+      "foundingDate": "2009",
+      "description": c.story_text || "Democratizing technology by delivering certified high-end refurbished laptops and enterprise IT hardware.",
+      "logo": "https://www.yuvacomputers.in/favicon-32x32.png"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.yuvacomputers.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "About Us",
+          "item": "https://www.yuvacomputers.in/company"
+        }
+      ]
+    }
+  ];
+
   return (
     <>
+      <SEO
+        title="About Us | Yuva Computers - Democratizing Technology"
+        description="Learn about Yuva Computers' journey since 2009. We provide top-grade, certified refurbished laptops, enterprise desktops, and IT solutions across India."
+        canonical="/company"
+        jsonLd={companySchema}
+      />
+
       {/* Hero */}
       <section className="relative overflow-hidden">
         {c.hero_image

@@ -21,41 +21,41 @@ import NotFound from "@/pages/NotFound";
 import StateStoresPage from "@/pages/StateStoresPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import ScrollToTop from "./components/ScrolltoTop";
+import AnalyticsTracker from "./components/AnalyticsTracker"; // 1. Import tracker
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-     <AuthProvider> 
-    <TooltipProvider>
-      <CartProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <CartDrawer />
-           <ScrollToTop />
-          <Routes>
-            <Route element={<Layout />}>
-              
-              <Route path="/" element={<HomePage />} />
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/product/:slug" element={<ProductDetailPage />} />
-              <Route path="/bulk-orders" element={<BulkOrdersPage />} />
-              <Route path="/company" element={<CompanyPage />} />
-              
-              <Route path="/stores" element={<StoresPage />} />
-              <Route path="/stores/:state" element={<StateStoresPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/blogs/:slug" element={<BlogDetailPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </CartProvider>
-    </TooltipProvider>
+    <AuthProvider> 
+      <TooltipProvider>
+        <CartProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <CartDrawer />
+            <ScrollToTop />
+            <AnalyticsTracker /> {/* 2. Add tracker inside BrowserRouter */}
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/products" element={<ProductsPage />} />
+                <Route path="/product/:slug" element={<ProductDetailPage />} />
+                <Route path="/bulk-orders" element={<BulkOrdersPage />} />
+                <Route path="/company" element={<CompanyPage />} />
+                <Route path="/stores" element={<StoresPage />} />
+                <Route path="/stores/:state" element={<StateStoresPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/blogs/:slug" element={<BlogDetailPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
+      </TooltipProvider>
     </AuthProvider> 
   </QueryClientProvider>
 );
