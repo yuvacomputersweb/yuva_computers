@@ -367,19 +367,44 @@ const ProductsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="py-20 text-center text-muted-foreground">
-                <p className="font-semibold mb-2">No products found</p>
-                <p className="text-sm">Try adjusting or clearing your filters.</p>
-                {activeFilterCount > 0 && (
-                  <button
-                    onClick={() => setSelectedFilters({})}
-                    className="mt-4 text-primary font-semibold text-sm hover:underline"
-                  >
-                    Clear all filters
-                  </button>
-                )}
-              </div>
-            )}
+  <div className="py-20 text-center text-muted-foreground">
+    <p className="font-semibold mb-2 text-foreground text-lg">
+      No products found for this selection
+    </p>
+    <p className="text-sm mb-6 max-w-md mx-auto">
+      We regularly restock our certified refurbished inventory. Try clearing your active filters or explore our main categories below:
+    </p>
+
+    <div className="flex flex-wrap justify-center gap-3 text-sm font-bold">
+      {activeFilterCount > 0 && (
+        <button
+          onClick={() => setSelectedFilters({})}
+          className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Clear All Filters ({activeFilterCount})
+        </button>
+      )}
+      <a
+        href="/products"
+        className="border border-border/40 bg-card px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors"
+      >
+        Browse All Products
+      </a>
+      <a
+        href="/stores"
+        className="border border-border/40 bg-card px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors"
+      >
+        Visit Experience Stores
+      </a>
+      <a
+        href="/bulk-orders"
+        className="border border-border/40 bg-card px-4 py-2 rounded-lg text-foreground hover:bg-muted transition-colors"
+      >
+        Corporate Bulk Orders
+      </a>
+    </div>
+  </div>
+)}
           </main>
         </div>
       </div>
