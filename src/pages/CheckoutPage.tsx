@@ -339,7 +339,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-    import { SEO } from "@/components/SEO";
+    <SEO title="Secure Checkout | Yuva Computers" canonical="/checkout" noindex={true} />
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 md:px-6 py-4 md:py-8">
         <h1 className="font-display font-extrabold text-2xl md:text-3xl text-foreground mb-8">

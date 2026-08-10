@@ -18,7 +18,7 @@ const DEFAULT_DESC =
 const DEFAULT_OG_IMAGE = `${DOMAIN}/favicon-32x32.png`;
 
 export const SEO: React.FC<SEOProps> = ({
-  title = DEFAULT_TITLE,
+  title,
   description = DEFAULT_DESC,
   canonical,
   ogType = "website",
@@ -26,11 +26,15 @@ export const SEO: React.FC<SEOProps> = ({
   noindex = false,
   jsonLd,
 }) => {
+  // Prevent any title string containing "undefined" from rendering
+  const safeTitle =
+    title && !title.includes("undefined") ? title : DEFAULT_TITLE;
+
   const currentUrl = canonical ? `${DOMAIN}${canonical}` : DOMAIN;
 
   return (
     <Helmet>
-      <title>{title}</title>
+      <title>{safeTitle}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={currentUrl} />
 
@@ -43,7 +47,7 @@ export const SEO: React.FC<SEOProps> = ({
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={currentUrl} />
-      <meta property="og:title" content={title} />
+      <meta property="og:title" content={safeTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
       <meta property="og:site_name" content="Yuva Computers" />
@@ -51,7 +55,7 @@ export const SEO: React.FC<SEOProps> = ({
       {/* Twitter Cards */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={currentUrl} />
-      <meta name="twitter:title" content={title} />
+      <meta name="twitter:title" content={safeTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
 

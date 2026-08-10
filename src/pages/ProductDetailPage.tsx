@@ -35,25 +35,37 @@ export default function ProductDetailPage() {
     load();
   }, [slug]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin w-10 h-10" /></div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin w-10 h-10" />
+      </div>
+    );
+  }
 
   if (!product) return null;
 
-  // Price determination based on active variant or base product
+  // Safe evaluations after product loading is confirmed
+  const productName = product.name || "Refurbished Product";
   const currentPrice = activeVariant?.final_price || product.price || 0;
-  const productImage = product.primary_image || (product.images && product.images[0]?.image) || "https://www.yuvacomputers.in/favicon-32x32.png";
-  const cleanDescription = (product.description || "").substring(0, 160).replace(/\n/g, " ");
+  const productImage =
+    product.primary_image ||
+    (product.images && product.images[0]?.image) ||
+    "https://www.yuvacomputers.in/favicon-32x32.png";
+  const cleanDescription = (product.description || "")
+    .substring(0, 160)
+    .replace(/\n/g, " ");
 
   const productSchema = [
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "name": product.name,
+      "name": productName,
       "image": productImage,
       "description": cleanDescription,
       "brand": {
         "@type": "Brand",
-        "name": product.brand_name || "Yuva Computers"
+        "name": product.brand_name || "Yuva Computers",
       },
       "offers": {
         "@type": "Offer",
@@ -61,8 +73,10 @@ export default function ProductDetailPage() {
         "priceCurrency": "INR",
         "price": currentPrice,
         "itemCondition": "https://schema.org/RefurbishedCondition",
-        "availability": product.in_stock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
-      }
+        "availability": product.in_stock
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      },
     },
     {
       "@context": "https://schema.org",
@@ -72,29 +86,32 @@ export default function ProductDetailPage() {
           "@type": "ListItem",
           "position": 1,
           "name": "Home",
-          "item": "https://www.yuvacomputers.in/"
+          "item": "https://www.yuvacomputers.in/",
         },
         {
           "@type": "ListItem",
           "position": 2,
           "name": "Products",
-          "item": "https://www.yuvacomputers.in/products"
+          "item": "https://www.yuvacomputers.in/products",
         },
         {
           "@type": "ListItem",
           "position": 3,
-          "name": product.name,
-          "item": `https://www.yuvacomputers.in/product/${slug}`
-        }
-      ]
-    }
+          "name": productName,
+          "item": `https://www.yuvacomputers.in/product/${slug}`,
+        },
+      ],
+    },
   ];
 
   return (
     <>
       <SEO
-        title={`${product.name} | Yuva Computers`}
-        description={cleanDescription || `Buy ${product.name} at the best price with warranty at Yuva Computers.`}
+        title={`${productName} | Yuva Computers`}
+        description={
+          cleanDescription ||
+          `Buy ${productName} at the best price with warranty at Yuva Computers.`
+        }
         canonical={`/product/${slug}`}
         ogType="product"
         ogImage={productImage}
@@ -106,7 +123,7 @@ export default function ProductDetailPage() {
           <div className="space-y-6">
             <ProductInfo product={product} onVariantChange={setActiveVariant} />
             <TrustBadges product={product} />
-            
+
             {/* Mobile Description Block (Matches Tab UI) */}
             <div className="lg:hidden space-y-8 pt-4">
               <div className="prose max-w-none text-muted-foreground">
@@ -115,7 +132,7 @@ export default function ProductDetailPage() {
                 </h4>
                 <p className="whitespace-pre-line text-sm">{product.description}</p>
               </div>
-              
+
               {product.highlights_list?.length > 0 && (
                 <div>
                   <h4 className="font-bold text-foreground mb-4 text-sm">Key Highlights</h4>
@@ -132,12 +149,16 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="block">
           <ProductTabs product={product} slug={slug!} />
         </div>
 
-        {related.length > 0 && <section className="mt-16"><ProductCarousel products={related} title="You May Also Like" /></section>}
+        {related.length > 0 && (
+          <section className="mt-16">
+            <ProductCarousel products={related} title="You May Also Like" />
+          </section>
+        )}
         <ReviewSection product={product} activeVariant={activeVariant} />
       </div>
     </>
