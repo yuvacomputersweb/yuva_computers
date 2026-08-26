@@ -20,6 +20,9 @@ import CheckoutPage from "@/pages/CheckoutPage";
 import NotFound from "@/pages/NotFound";
 import StateStoresPage from "@/pages/StateStoresPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
+import FaqPage from "@/pages/FaqPage";
+import ReturnRefundPolicyPage from "@/pages/ReturnRefundPolicyPage";
+import ShippingPolicyPage from "@/pages/ShippingPolicyPage";
 import ScrollToTop from "./components/ScrolltoTop";
 import AnalyticsTracker from "./components/AnalyticsTracker"; // 1. Import tracker
 
@@ -48,6 +51,9 @@ const App = () => (
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/blogs/:slug" element={<BlogDetailPage />} />
+                <Route path="/faq" element={<FaqPage />} />
+                <Route path="/returns-refund-policy" element={<ReturnRefundPolicyPage />} />
+                <Route path="/shipping-policy" element={<ShippingPolicyPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
               </Route>

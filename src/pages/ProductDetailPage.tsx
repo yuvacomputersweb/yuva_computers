@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Loader2, FileText, CheckCircle } from "lucide-react";
+import { Loader2, FileText, CheckCircle, HelpCircle } from "lucide-react";
 import { storeService } from "@/services/api";
 import { toast } from "sonner";
 import ImageGallery from "@/components/product/ImageGallery";
@@ -9,6 +9,13 @@ import ProductTabs from "@/components/product/ProductTabs";
 import ProductCarousel from "@/components/ProductCarousel";
 import ReviewSection from "@/components/product/ReviewsSection";
 import TrustBadges from "@/components/product/TrustBadges";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { FAQ_SECTIONS } from "@/data/faqs";
 import { SEO } from "@/components/SEO";
 
 export default function ProductDetailPage() {
@@ -171,6 +178,50 @@ export default function ProductDetailPage() {
           </section>
         )}
         <ReviewSection product={product} activeVariant={activeVariant} />
+
+        {/* FAQ Section */}
+        <section className="mt-16">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center shrink-0">
+                <HelpCircle className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="font-display font-extrabold text-2xl text-foreground tracking-tight">
+                  Frequently Asked Questions
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Common questions about buying refurbished laptops from Yuva Computers.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-10">
+              {FAQ_SECTIONS.map((section) => (
+                <div key={section.title}>
+                  <h3 className="font-display font-extrabold text-xl text-foreground tracking-tight mb-4">
+                    {section.title}
+                  </h3>
+                  <Accordion type="single" collapsible>
+                    {section.items.map((item, i) => (
+                      <AccordionItem
+                        key={item.question}
+                        value={`${section.title}-${i}`}
+                      >
+                        <AccordionTrigger className="text-left font-display font-semibold text-foreground">
+                          {item.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                          {item.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     </>
   );

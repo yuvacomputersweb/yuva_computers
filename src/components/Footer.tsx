@@ -56,6 +56,7 @@ const Footer = () => {
               <li><Link to="/bulk-orders" className="hover:text-white">Bulk Orders</Link></li>
               <li><Link to="/company" className="hover:text-white">Company</Link></li>
               <li><Link to="/stores" className="hover:text-white">Stores</Link></li>
+              <li><Link to="/faq" className="hover:text-white">FAQ</Link></li>
               <li><Link to="/contact" className="hover:text-white">Contact Us</Link></li>
             </ul>
           </div>
@@ -108,13 +109,18 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-white">
-                  Warranty & Returns
+                <Link to="/returns-refund-policy" className="hover:text-white">
+                  Return and Refund Policy
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-white">
-                  Shipping Info
+                <Link to="/shipping-policy" className="hover:text-white">
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-white">
+                  FAQ
                 </Link>
               </li>
             </ul>
