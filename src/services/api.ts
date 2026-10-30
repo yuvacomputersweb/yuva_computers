@@ -214,6 +214,9 @@ export const orderService = {
 
   validateExchangeCode: async (code: string) =>
     (await api.post('/orders/validate-exchange-code/', { code })).data,
+  trackOrder: async (orderId: string, phone: string) =>
+    (await api.get('/orders/track/', { params: { order_id: orderId, phone } })).data,
+
   cancelOrder: async (orderId: number) =>
   (await api.post(`/orders/${orderId}/cancel/`)).data,
 };

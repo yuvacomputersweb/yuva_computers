@@ -123,7 +123,7 @@ const Footer = () => {
             <li><Link to="/contact?type=complaint" className={linkClass}>Complaint / issue form</Link></li>
             <li><Link to="/returns-refund-policy" className={linkClass}>Return & refund policy</Link></li>
             <li><Link to="/shipping-policy" className={linkClass}>Shipping policy</Link></li>
-            <li><Link to="/profile" className={linkClass}>Track my order</Link></li>
+            <li><Link to="/track-order" className={linkClass}>Track my order</Link></li>
           </FooterColumn>
         </div>
 
