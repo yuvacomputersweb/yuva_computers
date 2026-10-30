@@ -7,6 +7,7 @@ import {
   useEffect,
   type ReactNode
 } from "react";
+import { engageService } from "@/services/api";
 
 interface CartItem {
   id: string;
@@ -59,6 +60,32 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       console.error("Failed to save cart:", err);
     }
+  }, [items]);
+
+  // Logged-in customers: keep a copy on the server so we can send one
+  // WhatsApp reminder if they leave without ordering.
+  useEffect(() => {
+    let hasToken = false;
+    try {
+      hasToken = !!localStorage.getItem("yuvaToken");
+    } catch {
+      /* storage blocked */
+    }
+    if (!hasToken) return;
+    const timer = window.setTimeout(() => {
+      engageService
+        .saveCart(
+          items.map((i) => ({
+            product_id: i.productId,
+            variant_id: i.variantId ?? undefined,
+            title: i.variant ? `${i.name} (${i.variant})` : i.name,
+            quantity: i.quantity,
+            price: i.price,
+          }))
+        )
+        .catch(() => undefined);
+    }, 2000);
+    return () => window.clearTimeout(timer);
   }, [items]);
 
   const addToCart = useCallback((product: any, quantity: number, variant?: any) => {

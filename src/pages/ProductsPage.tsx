@@ -139,6 +139,7 @@ const ProductsPage = () => {
     if (searchParams.get("category")) return prettify(searchParams.get("category")!);
     if (searchParams.get("usage")) return `Laptops for ${prettify(searchParams.get("usage")!)}`;
     if (searchParams.get("processor")) return `${prettify(searchParams.get("processor")!)} laptops`;
+    if (searchParams.get("condition")) return `${prettify(searchParams.get("condition")!)} condition laptops`;
     if (searchParams.get("is_best_deal")) return "Best deals";
     if (searchParams.get("is_best_seller")) return "Best sellers";
     if (searchParams.get("is_trending")) return "Trending now";

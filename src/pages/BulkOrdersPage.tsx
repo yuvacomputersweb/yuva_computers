@@ -15,7 +15,7 @@ const ICON_MAP: Record<string, any> = {
 const DEFAULT_BENEFITS = [
   { title: "Volume pricing", description: "Better per-unit prices for teams, labs and offices ordering five or more devices.", icon: "star" },
   { title: "RAM & SSD upgrades", description: "Tell us the configuration you need and we upgrade machines before delivery.", icon: "settings" },
-  { title: "GST invoice", description: "Share your GSTIN and registered business name and we bill your company directly.", icon: "file" },
+  { title: "Warranty & service", description: "Every device is tested before dispatch and covered by our warranty and service support.", icon: "shield" },
   { title: "Corporate rentals", description: "Need laptops for a project or a batch? Ask about our laptop rental plans.", icon: "repeat" },
 ];
 
@@ -132,7 +132,7 @@ const BulkOrdersPage = () => {
     <>
       <SEO
         title="Corporate Bulk Orders & Enterprise IT | Yuva Computers"
-        description="Equip your office with refurbished workstations, mini PCs, and desktops. Get custom corporate pricing, GST invoices, and dedicated support."
+        description="Equip your office with refurbished workstations, mini PCs, and desktops. Get custom corporate pricing and dedicated support."
         canonical="/bulk-orders"
       />
 

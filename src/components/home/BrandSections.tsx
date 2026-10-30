@@ -134,10 +134,10 @@ export const BulkOrderCta = () => (
           </h2>
           <p className="mt-4 text-white/70 max-w-xl">
             We supply tested laptops and desktops in volume to startups, training institutes, BPOs
-            and enterprises — with RAM and SSD upgrades on request and a GST invoice.
+            and enterprises — with RAM and SSD upgrades on request.
           </p>
           <ul className="mt-6 grid sm:grid-cols-2 gap-2 text-sm text-white/80">
-            {["Volume pricing", "RAM & SSD upgrades", "GST invoice", "Corporate laptop rentals"].map((t) => (
+            {["Volume pricing", "RAM & SSD upgrades", "Warranty on every unit", "Corporate laptop rentals"].map((t) => (
               <li key={t} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-brand-leaf" /> {t}</li>
             ))}
           </ul>

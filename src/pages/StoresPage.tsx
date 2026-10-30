@@ -5,6 +5,8 @@ import { contentService } from "@/services/api";
 import { SEO } from "@/components/SEO";
 import PageHero from "@/components/PageHero";
 import { whatsappLink } from "@/lib/site";
+import { Link } from "react-router-dom";
+import { storeSlug } from "./LocalStorePage";
 
 interface StoreItem {
   id: number;
@@ -150,6 +152,13 @@ const StoresPage = () => {
                             <Navigation className="w-3.5 h-3.5" /> Directions
                           </a>
                         )}
+                        <Link
+                          to={`/refurbished-laptops-in/${storeSlug(store.name)}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center h-9 px-3.5 rounded-full text-xs font-semibold text-primary hover:underline"
+                        >
+                          Store page →
+                        </Link>
                       </div>
                     </div>
                   </li>
