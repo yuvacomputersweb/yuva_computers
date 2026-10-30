@@ -22,3 +22,7 @@ export const normalizeProcessor = (raw: string): string => {
   return raw.trim();
 };
 
+
+/** Placeholder spec values (e.g. monitors have no RAM/storage) that should never be shown. */
+export const isPlaceholderSpec = (v?: string | null) =>
+  !v || /^(n\/?a|na|-+|none|not applicable)$/i.test(v.trim());

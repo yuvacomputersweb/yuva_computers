@@ -1,56 +1,62 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { contentService } from "@/services/api";
+// Shop by brand and by processor — the shortcuts most refurbished-laptop buyers search by.
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Cpu, ArrowRight } from "lucide-react";
+import { storeService } from "@/services/api";
+import { SectionHeading } from "./ShopSections";
 
-const FALLBACK_PARTNERS = [
-  { name: "DELL", color: "#254fa0" },
-  { name: "HP", color: "#34a1da" },
-  { name: "LENOVO", color: "#1c6a0e" },
-  { name: "APPLE", color: "#7fc140" },
-  { name: "ASUS", color: "#d62828" },
-  { name: "ACER", color: "#f77f00" },
+const PROCESSORS = [
+  { label: "Intel Core i5", hint: "Everyday & office", q: "i5" },
+  { label: "Intel Core i7", hint: "Power & multitasking", q: "i7" },
+  { label: "AMD Ryzen", hint: "Great value", q: "ryzen" },
+  { label: "Apple Silicon", hint: "M1 Pro & M2 Pro", q: "apple m" },
 ];
 
 export const PartnersSection = () => {
-  const [partners, setPartners] = useState(FALLBACK_PARTNERS);
+  const [brands, setBrands] = useState<{ id: number; name: string; slug: string }[]>([]);
 
   useEffect(() => {
-    contentService.getHomeContent()
-      .then(data => {
-        if (data.partners?.length > 0) {
-          setPartners(data.partners.map((p: any, i: number) => ({
-            name: p.name,
-            color: p.color || FALLBACK_PARTNERS[i % FALLBACK_PARTNERS.length]?.color || '#888',
-          })));
-        }
-      })
-      .catch(() => {});
+    storeService.getBrands().then(setBrands).catch(() => undefined);
   }, []);
 
   return (
-    <section className="py-10 md:py-14 border-t border-border overflow-hidden">
-      <div className="container mx-auto px-6 text-center mb-8">
-        <p className="text-xs font-display font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Brands we sell & service
-        </p>
-      </div>
-      <div className="relative flex overflow-hidden whitespace-nowrap w-full group">
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
-        <motion.div
-          className="flex gap-16 lg:gap-24 items-center shrink-0 w-max"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, ease: "linear", duration: 25 }}
-        >
-          {[...partners, ...partners].map((p, i) => (
-            <span
-              key={i}
-              className="font-display font-extrabold text-2xl tracking-widest text-muted-foreground/50 hover:text-foreground transition-colors"
-            >
-              {p.name}
-            </span>
-          ))}
-        </motion.div>
+    <section className="py-14 md:py-20 border-t border-border">
+      <div className="container mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-12">
+        <div>
+          <SectionHeading eyebrow="Shop by brand" title="Top business brands" />
+          <div className="grid grid-cols-2 gap-3">
+            {brands.map((b) => (
+              <Link
+                key={b.id}
+                to={`/products?brand=${b.slug}`}
+                className="group h-20 rounded-2xl border border-border bg-card px-5 flex items-center justify-between hover:border-primary/30 hover:shadow-lg transition-all"
+              >
+                <span className="font-display font-extrabold text-xl tracking-wide uppercase">{b.name}</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition" />
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div>
+          <SectionHeading eyebrow="Shop by processor" title="Pick your performance" />
+          <div className="grid grid-cols-2 gap-3">
+            {PROCESSORS.map((p) => (
+              <Link
+                key={p.q}
+                to={`/products?processor=${encodeURIComponent(p.q)}`}
+                className="group h-20 rounded-2xl border border-border bg-card px-5 flex items-center gap-3 hover:border-primary/30 hover:shadow-lg transition-all"
+              >
+                <span className="w-10 h-10 rounded-xl bg-brand-navy text-brand-leaf grid place-items-center shrink-0">
+                  <Cpu className="w-5 h-5" />
+                </span>
+                <span>
+                  <span className="block font-display font-bold">{p.label}</span>
+                  <span className="block text-xs text-muted-foreground">{p.hint}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

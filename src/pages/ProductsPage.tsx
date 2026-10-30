@@ -6,7 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import { type ApiProduct, collectVariantValues } from "@/types/product";
 import { SEO } from "@/components/SEO";
 import { BUDGET_RANGES, budgetHref, whatsappLink } from "@/lib/site";
-import { normalizeProcessor, normalizeSize } from "@/lib/specs";
+import { normalizeProcessor, normalizeSize, isPlaceholderSpec } from "@/lib/specs";
 
 
 const NORMALIZERS: Record<string, (v: string) => string> = {
@@ -21,7 +21,7 @@ const sizeOrder = (v: string) => {
 };
 
 const uniqueSorted = (values: string[], normalize: (v: string) => string, bySize = false) => {
-  const set = Array.from(new Set(values.map(normalize).filter(Boolean)));
+  const set = Array.from(new Set(values.filter((v) => !isPlaceholderSpec(v)).map(normalize).filter(Boolean)));
   return bySize ? set.sort((a, b) => sizeOrder(a) - sizeOrder(b)) : set.sort();
 };
 
@@ -138,6 +138,7 @@ const ProductsPage = () => {
       return `${prettify(searchParams.get("brand")!)} ${prettify(searchParams.get("category") || "")}`.trim();
     if (searchParams.get("category")) return prettify(searchParams.get("category")!);
     if (searchParams.get("usage")) return `Laptops for ${prettify(searchParams.get("usage")!)}`;
+    if (searchParams.get("processor")) return `${prettify(searchParams.get("processor")!)} laptops`;
     if (searchParams.get("is_best_deal")) return "Best deals";
     if (searchParams.get("is_best_seller")) return "Best sellers";
     if (searchParams.get("is_trending")) return "Trending now";

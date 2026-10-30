@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isPlaceholderSpec } from "@/lib/specs";
 import { CheckCircle, ShieldCheck, Wrench, FileText } from "lucide-react";
 
 interface ProductTabsProps {
@@ -72,7 +73,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
             { label: "Battery", val: product.battery },
             { label: "Weight", val: product.weight },
             { label: "Ports", val: product.ports },
-          ].filter((item) => item.val).map((item, i) => (
+          ].filter((item) => !isPlaceholderSpec(item.val)).map((item, i) => (
             <p key={i} className="flex justify-between gap-6 border-b border-border py-3 text-sm">
               <span className="text-muted-foreground">{item.label}</span>
               <strong className="text-right text-foreground">{item.val}</strong>

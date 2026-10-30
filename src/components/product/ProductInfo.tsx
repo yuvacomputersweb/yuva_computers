@@ -1,10 +1,12 @@
 //product info component
 import { useState, useMemo, useEffect, useRef } from "react";
-import { ShoppingCart, Zap, Star, Minus, Plus, MessageCircle, Truck, Store, Cpu, MemoryStick, HardDrive, Monitor } from "lucide-react";
+import { ShoppingCart, Zap, Star, Minus, Plus, MessageCircle, Truck, Store, Cpu, MemoryStick, HardDrive, Monitor, Heart, Scale } from "lucide-react";
+import { useShopLists } from "@/contexts/ShopListsContext";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { whatsappLink } from "@/lib/site";
+import { isPlaceholderSpec } from "@/lib/specs";
 
 const conditionStyles: Record<string, string> = {
   like_new: "bg-brand-leaf/15 text-brand-leaf-dark",
@@ -64,6 +66,9 @@ export default function ProductInfo({
   onVariantChange: (v: any) => void;
 }) {
   const { addToCart } = useCart();
+  const { isWishlisted, isCompared, toggleWishlist, toggleCompare } = useShopLists();
+  const saved = isWishlisted(product.id);
+  const comparing = isCompared(product.id);
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const ctaRef = useRef<HTMLDivElement>(null);
@@ -217,12 +222,17 @@ export default function ProductInfo({
     [variants]
   );
 
+  // Windows laptops can be upgraded before delivery (per the store's FAQ).
+  const isUpgradeable =
+    ["laptops", "graphic card laptops"].includes(String(product.category_name).toLowerCase()) &&
+    product.brand_name?.toLowerCase() !== "apple";
+
   const keySpecs = [
     { icon: Cpu, label: "Processor", value: activeVariant?.processor || product.processor },
     { icon: MemoryStick, label: "RAM", value: activeVariant?.ram || product.ram },
     { icon: HardDrive, label: "Storage", value: activeVariant?.storage || product.storage },
     { icon: Monitor, label: "Display", value: product.display },
-  ].filter((s) => s.value);
+  ].filter((s) => !isPlaceholderSpec(s.value));
 
   const stockLabel =
     currentStock === 0 ? "Out of stock" : currentStock <= 3 ? `Only ${currentStock} left` : "In stock";
@@ -249,6 +259,24 @@ export default function ProductInfo({
         <h1 className="font-display text-2xl md:text-4xl font-extrabold text-foreground tracking-tight leading-tight">
           {product.title}
         </h1>
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={() => toggleWishlist(product)}
+            aria-pressed={saved}
+            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full border border-border text-xs font-semibold hover:border-foreground/40"
+          >
+            <Heart className={`w-4 h-4 ${saved ? "fill-red-500 text-red-500" : ""}`} /> {saved ? "Saved" : "Save"}
+          </button>
+          <button
+            onClick={() => toggleCompare(product)}
+            aria-pressed={comparing}
+            className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full border text-xs font-semibold ${
+              comparing ? "bg-brand-leaf border-brand-leaf text-white" : "border-border hover:border-foreground/40"
+            }`}
+          >
+            <Scale className="w-4 h-4" /> {comparing ? "Comparing" : "Compare"}
+          </button>
+        </div>
         {product.review_count > 0 && (
           <a href="#reviews" className="inline-flex items-center gap-2 mt-2">
             <div className="flex">
@@ -320,14 +348,28 @@ export default function ProductInfo({
           {hasProcessorVariants && processorOptions.length > 1 && (
             <OptionGroup label="Processor" options={processorOptions} selected={selectedProcessor} onSelect={setSelectedProcessor} />
           )}
-          <OptionGroup label="RAM" options={ramOptions} selected={selectedRam} onSelect={setSelectedRam} />
-          <OptionGroup
-            label="Storage"
-            options={allStorages}
-            selected={selectedStorage}
-            onSelect={setSelectedStorage}
-            isAvailable={isStorageAvailable}
-          />
+          {!(ramOptions.length === 1 && isPlaceholderSpec(ramOptions[0])) && (
+            <OptionGroup label="RAM" options={ramOptions} selected={selectedRam} onSelect={setSelectedRam} />
+          )}
+          {!(allStorages.length === 1 && isPlaceholderSpec(allStorages[0])) && (
+            <OptionGroup
+              label="Storage"
+              options={allStorages}
+              selected={selectedStorage}
+              onSelect={setSelectedStorage}
+              isAvailable={isStorageAvailable}
+            />
+          )}
+          {isUpgradeable && (
+            <a
+              href={whatsappLink(`Hi, I'd like a RAM/SSD upgrade quote for ${product.title}.`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+            >
+              Need more RAM or storage? Get an upgrade quote →
+            </a>
+          )}
         </div>
       )}
 

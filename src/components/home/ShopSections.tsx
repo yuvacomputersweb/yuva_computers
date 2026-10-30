@@ -39,8 +39,10 @@ export const ViewAllLink = ({ to, label = "View all", dark = false }: { to: stri
 
 // ── Categories ─────────────────────────────────────────────────────────────
 
-export const CategoryGrid = ({ categories }: { categories: { id: number; name: string; slug: string; image?: string | null }[] }) => {
-  if (!categories?.length) return null;
+export const CategoryGrid = ({ categories: all }: { categories: { id: number; name: string; slug: string; image?: string | null; is_featured?: boolean }[] }) => {
+  // Only featured categories appear on the homepage (set in the admin).
+  const categories = (all || []).filter((c) => c.is_featured !== false);
+  if (!categories.length) return null;
   return (
     <section className="py-14 md:py-20">
       <div className="container mx-auto px-4 md:px-6">
@@ -49,8 +51,8 @@ export const CategoryGrid = ({ categories }: { categories: { id: number; name: s
           title="Find the right machine"
           action={<ViewAllLink to="/products" label="All products" />}
         />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-          {categories.slice(0, 6).map((cat) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
+          {categories.slice(0, 7).map((cat) => (
             <Link
               key={cat.id}
               to={`/products?category=${cat.slug}`}

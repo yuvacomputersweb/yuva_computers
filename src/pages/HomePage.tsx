@@ -100,12 +100,12 @@ const HomePage = () => {
         />
 
         <BudgetSection />
+        <PartnersSection />
         <WhyYuva about={content.about} />
         <StoresSection stores={stores} />
         <ReviewsSection />
         <BulkOrderCta />
         <BlogsSection />
-        <PartnersSection />
       </div>
     </>
   );

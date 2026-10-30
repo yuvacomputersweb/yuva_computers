@@ -3,11 +3,13 @@ import { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   ShoppingCart, Search, User, Menu, X,
-  ChevronDown, Package, LogOut, Loader2, Phone, MessageCircle,
+  ChevronDown, Package, LogOut, Loader2, Phone, MessageCircle, Heart, Sparkles, Tag,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { storeService } from "@/services/api";
-import { SITE, TRUST_POINTS, whatsappLink } from "@/lib/site";
+import { SITE, SALE, TRUST_POINTS, isSaleLive, whatsappLink } from "@/lib/site";
+import { useShopLists } from "@/contexts/ShopListsContext";
+import HelpMeChoose from "./HelpMeChoose";
 import MegaMenu from "./MegaMenu";
 import BrandLogo from "./BrandLogo";
 
@@ -32,6 +34,22 @@ const navLinks = [
   { label: "Company", path: "/company" },
   { label: "Contact", path: "/contact" },
 ];
+
+/** Seasonal sale bar; disappears on its own once the sale ends. */
+const SaleBar = () => {
+  if (!SALE || !isSaleLive()) return null;
+  const ends = new Date(SALE.endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  return (
+    <Link to={SALE.href} className="block bg-brand-leaf text-white text-xs sm:text-sm hover:brightness-105">
+      <div className="container mx-auto px-4 md:px-6 py-2 flex items-center justify-center gap-2 text-center">
+        <Tag className="w-4 h-4 shrink-0 hidden sm:block" />
+        <span>
+          <strong className="font-bold">{SALE.title}:</strong> {SALE.text} · till {ends}
+        </span>
+      </div>
+    </Link>
+  );
+};
 
 /** Thin navy strip with the store's guarantees, scrolling on small screens. */
 const TrustStrip = () => {
@@ -82,6 +100,8 @@ const Navbar = () => {
   const mobileSearchRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
   const { totalItems, setDrawerOpen } = useCart();
+  const { wishlist } = useShopLists();
+  const [quizOpen, setQuizOpen] = useState(false);
 
   useEffect(() => {
     const fetchMenuData = async () => {
@@ -207,6 +227,7 @@ const Navbar = () => {
 
   return (
     <>
+      <SaleBar />
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur border-b border-border">
         <TrustStrip />
 
@@ -227,14 +248,21 @@ const Navbar = () => {
           {renderSearch(searchRef, "hidden md:block flex-1 max-w-2xl")}
 
           <div className="flex items-center gap-1 ml-auto shrink-0">
-            <a
-              href={whatsappLink()}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => setQuizOpen(true)}
               className="hidden xl:flex items-center gap-2 h-10 px-4 mr-1 rounded-full border border-border text-sm font-semibold hover:border-brand-leaf hover:text-brand-leaf-dark transition-colors"
             >
-              <MessageCircle className="w-4 h-4 text-brand-leaf" /> Help me choose
-            </a>
+              <Sparkles className="w-4 h-4 text-brand-leaf" /> Help me choose
+            </button>
+
+            <Link to="/wishlist" aria-label="Wishlist" className={`hidden sm:grid ${iconButton}`}>
+              <Heart className="w-5 h-5" />
+              {wishlist.length > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 grid place-items-center text-[10px] font-bold bg-brand-navy text-white rounded-full">
+                  {wishlist.length}
+                </span>
+              )}
+            </Link>
 
             <button onClick={() => setDrawerOpen(true)} aria-label="Open cart" className={iconButton}>
               <ShoppingCart className="w-5 h-5" />
@@ -321,6 +349,8 @@ const Navbar = () => {
         </nav>
       </header>
 
+      <HelpMeChoose open={quizOpen} onClose={() => setQuizOpen(false)} />
+
       {/* MOBILE DRAWER */}
       {mobileOpen && (
         <>
@@ -347,6 +377,15 @@ const Navbar = () => {
                 />
               </div>
               <div className="pt-1">
+                <button
+                  onClick={() => { setMobileOpen(false); setQuizOpen(true); }}
+                  className="w-full flex items-center gap-2 py-3 px-3 font-semibold text-sm border-b border-border text-brand-leaf-dark"
+                >
+                  <Sparkles className="w-4 h-4" /> Help me choose a laptop
+                </button>
+                <Link to="/wishlist" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-3 px-3 font-semibold text-sm border-b border-border">
+                  <Heart className="w-4 h-4" /> Wishlist {wishlist.length > 0 && `(${wishlist.length})`}
+                </Link>
                 {navLinks.filter((l) => !["/", "/products"].includes(l.path)).map((l) => (
                   <Link
                     key={l.path}

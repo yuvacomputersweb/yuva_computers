@@ -18,6 +18,16 @@ export const SITE = {
   hours: "Open daily, 10:00 AM – 8:30 PM",
 };
 
+/** Seasonal offer shown above the header until `endsAt` (IST). Set to null when there's no sale. */
+export const SALE: { title: string; text: string; endsAt: string; href: string } | null = {
+  title: "Dussehra Sale",
+  text: "Up to ₹8,000 off select business laptops with spin-wheel, festival and student coupons in store",
+  endsAt: "2026-11-11T23:59:59+05:30",
+  href: "/products?is_trending=true",
+};
+
+export const isSaleLive = () => !!SALE && Date.now() < new Date(SALE.endsAt).getTime();
+
 export const SOCIAL_LINKS = [
   { label: "Instagram", handle: "@yuva.computers", href: "https://www.instagram.com/yuva.computers" },
   { label: "YouTube", handle: "@yuvacomputers", href: "https://youtube.com/@yuvacomputers" },

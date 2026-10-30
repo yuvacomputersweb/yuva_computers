@@ -1,9 +1,10 @@
 //productcard
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, Laptop, BadgeCheck, ArrowRight } from "lucide-react";
+import { Star, Laptop, BadgeCheck, ArrowRight, Heart, Scale, Check } from "lucide-react";
+import { useShopLists } from "@/contexts/ShopListsContext";
 import { type ApiProduct, getCardPrice, getPrimaryVariant } from "@/types/product";
-import { normalizeProcessor, normalizeSize } from "@/lib/specs";
+import { normalizeProcessor, normalizeSize, isPlaceholderSpec } from "@/lib/specs";
 
 const conditionStyles: Record<string, string> = {
   like_new: "bg-brand-leaf text-white",
@@ -34,6 +35,9 @@ export const ProductImage = ({ src, alt, className = "" }: { src?: string; alt: 
 };
 
 const ProductCard = ({ product }: { product: ApiProduct }) => {
+  const { isWishlisted, isCompared, toggleWishlist, toggleCompare } = useShopLists();
+  const saved = isWishlisted(product.id);
+  const comparing = isCompared(product.id);
   const primaryImage = product.images?.find((i) => i.is_primary)?.image || product.images?.[0]?.image;
 
   // ── Price: cheapest in-stock variant ────────────────────────────────────
@@ -48,9 +52,9 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
   const primary = getPrimaryVariant(product);
   const specs = primary
     ? [
-        primary.processor && normalizeProcessor(primary.processor),
-        primary.ram && `${normalizeSize(primary.ram)} RAM`,
-        primary.storage && normalizeSize(primary.storage),
+        !isPlaceholderSpec(primary.processor) && normalizeProcessor(primary.processor),
+        !isPlaceholderSpec(primary.ram) && `${normalizeSize(primary.ram)} RAM`,
+        !isPlaceholderSpec(primary.storage) && normalizeSize(primary.storage),
       ].filter(Boolean) as string[]
     : [];
   const variantCount = product.variants?.length ?? 0;
@@ -68,7 +72,7 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
             {product.condition_display || product.condition}
           </span>
           {discount > 0 && (
-            <span className="absolute top-3 right-3 z-10 px-2 py-1 rounded-full text-[10px] font-bold bg-white text-brand-leaf-dark shadow-sm">
+            <span className="absolute bottom-3 left-3 z-10 px-2 py-1 rounded-full text-[10px] font-bold bg-white text-brand-leaf-dark shadow-sm">
               {discount}% OFF
             </span>
           )}
@@ -79,6 +83,16 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
           />
         </div>
       </Link>
+
+      {/* Save / compare — outside the link so taps don't open the product */}
+      <button
+        onClick={() => toggleWishlist(product)}
+        aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+        aria-pressed={saved}
+        className="absolute top-2.5 right-2.5 z-10 w-9 h-9 grid place-items-center rounded-full bg-white/90 shadow-sm hover:bg-white"
+      >
+        <Heart className={`w-4 h-4 ${saved ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+      </button>
 
       <div className="p-3 sm:p-4 flex flex-col flex-1">
         <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -132,12 +146,25 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
             <BadgeCheck className="w-3.5 h-3.5" /> 50-point quality checked
           </p>
 
-          <Link
-            to={`/product/${product.slug}`}
-            className="mt-3 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-brand-navy text-white text-sm font-semibold group-hover:bg-primary transition-colors"
-          >
-            View details <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="mt-3 flex gap-2">
+            <Link
+              to={`/product/${product.slug}`}
+              className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-brand-navy text-white text-sm font-semibold group-hover:bg-primary transition-colors"
+            >
+              View <span className="hidden sm:inline">details</span> <ArrowRight className="w-4 h-4" />
+            </Link>
+            <button
+              onClick={() => toggleCompare(product)}
+              aria-pressed={comparing}
+              aria-label={comparing ? "Remove from compare" : "Add to compare"}
+              title={comparing ? "Remove from compare" : "Compare"}
+              className={`w-10 h-10 shrink-0 grid place-items-center rounded-xl border transition-colors ${
+                comparing ? "bg-brand-leaf border-brand-leaf text-white" : "border-border hover:border-foreground/40"
+              }`}
+            >
+              {comparing ? <Check className="w-4 h-4" /> : <Scale className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       </div>
     </div>
