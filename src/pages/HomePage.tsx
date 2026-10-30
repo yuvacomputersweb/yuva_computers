@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { storeService, contentService } from "@/services/api";
 import type { ApiProduct } from "@/types/product";
 import { HeroSection } from "@/components/home/HeroSection";
+import { PromoCarousel } from "@/components/home/PromoCarousel";
 import { CategoryGrid, BudgetSection, ProductShowcase } from "@/components/home/ShopSections";
 import { WhyYuva, StoresSection, BulkOrderCta } from "@/components/home/BrandSections";
 import { PartnersSection } from "@/components/home/PartnersSection";
@@ -86,6 +87,8 @@ const HomePage = () => {
           featured={storeData.best_deals[0] || storeData.best_sellers[0]}
           storeCount={stores.length}
         />
+
+        <PromoCarousel slides={content.hero_slides} />
 
         <CategoryGrid categories={storeData.categories} />
 

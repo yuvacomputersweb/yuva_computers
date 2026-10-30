@@ -23,6 +23,7 @@ import BlogDetailPage from "./pages/BlogDetailPage";
 import BlogsPage from "@/pages/BlogsPage";
 import ComparePage from "@/pages/ComparePage";
 import WishlistPage from "@/pages/WishlistPage";
+import TrackOrderPage from "@/pages/TrackOrderPage";
 import FaqPage from "@/pages/FaqPage";
 import ReturnRefundPolicyPage from "@/pages/ReturnRefundPolicyPage";
 import ShippingPolicyPage from "@/pages/ShippingPolicyPage";
@@ -57,6 +58,7 @@ const App = () => (
                 <Route path="/blogs" element={<BlogsPage />} />
                 <Route path="/compare" element={<ComparePage />} />
                 <Route path="/wishlist" element={<WishlistPage />} />
+                <Route path="/track-order" element={<TrackOrderPage />} />
                 <Route path="/blogs/:slug" element={<BlogDetailPage />} />
                 <Route path="/faq" element={<FaqPage />} />
                 <Route path="/returns-refund-policy" element={<ReturnRefundPolicyPage />} />

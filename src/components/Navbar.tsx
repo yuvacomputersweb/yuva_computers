@@ -6,7 +6,7 @@ import {
   ChevronDown, Package, LogOut, Loader2, Phone, MessageCircle, Heart, Sparkles, Tag,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { storeService } from "@/services/api";
+import { storeService, contentService } from "@/services/api";
 import { SITE, SALE, TRUST_POINTS, isSaleLive, whatsappLink } from "@/lib/site";
 import { useShopLists } from "@/contexts/ShopListsContext";
 import HelpMeChoose from "./HelpMeChoose";
@@ -33,22 +33,53 @@ const navLinks = [
   { label: "Stores", path: "/stores" },
   { label: "Company", path: "/company" },
   { label: "Contact", path: "/contact" },
+  { label: "Track order", path: "/track-order" },
 ];
 
-/** Seasonal sale bar; disappears on its own once the sale ends. */
+interface Announcement { title: string; text: string; link: string; color: string; ends_at: string | null }
+
+const BAR_COLORS: Record<string, string> = {
+  green: "bg-brand-leaf text-white",
+  navy: "bg-brand-navy-soft text-white",
+  red: "bg-red-600 text-white",
+  orange: "bg-orange-500 text-white",
+};
+
+/**
+ * Sale / notice strip. Content comes from Admin → Content → Announcement bars;
+ * the SALE constant in lib/site.ts is only used if the backend doesn't send one.
+ */
 const SaleBar = () => {
-  if (!SALE || !isSaleLive()) return null;
-  const ends = new Date(SALE.endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-  return (
-    <Link to={SALE.href} className="block bg-brand-leaf text-white text-xs sm:text-sm hover:brightness-105">
-      <div className="container mx-auto px-4 md:px-6 py-2 flex items-center justify-center gap-2 text-center">
-        <Tag className="w-4 h-4 shrink-0 hidden sm:block" />
-        <span>
-          <strong className="font-bold">{SALE.title}:</strong> {SALE.text} · till {ends}
-        </span>
-      </div>
-    </Link>
+  const [bar, setBar] = useState<Announcement | null | undefined>(undefined);
+
+  useEffect(() => {
+    contentService
+      .getHomeContent()
+      .then((d: any) => setBar("announcement" in d ? d.announcement : undefined))
+      .catch(() => setBar(undefined));
+  }, []);
+
+  const fallback = SALE && isSaleLive()
+    ? { title: SALE.title, text: SALE.text, link: SALE.href, color: "green", ends_at: SALE.endsAt }
+    : null;
+  const shown = bar === undefined ? fallback : bar;
+  if (!shown) return null;
+
+  const ends = shown.ends_at
+    ? new Date(shown.ends_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+    : "";
+  const body = (
+    <div className="container mx-auto px-4 md:px-6 py-2 flex items-center justify-center gap-2 text-center">
+      <Tag className="w-4 h-4 shrink-0 hidden sm:block" />
+      <span>
+        {shown.title && <strong className="font-bold">{shown.title}: </strong>}
+        {shown.text}
+        {ends && <> · till {ends}</>}
+      </span>
+    </div>
   );
+  const cls = `block text-xs sm:text-sm ${BAR_COLORS[shown.color] || BAR_COLORS.green}`;
+  return shown.link ? <Link to={shown.link} className={`${cls} hover:brightness-105`}>{body}</Link> : <div className={cls}>{body}</div>;
 };
 
 /** Thin navy strip with the store's guarantees, scrolling on small screens. */
