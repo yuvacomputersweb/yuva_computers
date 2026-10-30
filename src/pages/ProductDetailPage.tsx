@@ -204,7 +204,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <ProductTabs product={product} slug={slug!} />
+        <ProductTabs product={product} slug={slug!} variant={activeVariant} />
 
         <div id="reviews" className="scroll-mt-40">
           <ReviewSection product={product} activeVariant={activeVariant} />
