@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Phone, MessageCircle, Mail, MapPin, Clock, AlertTriangle, Wrench, ShoppingCart, MessageSquare, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { submitContactForm, submitComplaint, contentService } from "@/services/api";
 import { SEO } from "@/components/SEO";
+import PageHero from "@/components/PageHero";
+import { SITE, SOCIAL_LINKS } from "@/lib/site";
 
 const ICON_MAP: Record<string, any> = {
   wrench: Wrench,
@@ -23,14 +26,14 @@ const PhoneInput = ({ value, onChange, error, bgClass = "bg-card" }: {
 }) => (
   <div>
     <div className="flex mt-1.5">
-      <span className={`${bgClass} rounded-l-lg px-3 py-2.5 text-sm text-muted-foreground border-r border-border/40 font-body select-none flex items-center`}>+91</span>
+      <span className={`${bgClass} rounded-l-xl px-3 h-11 text-sm text-muted-foreground border border-r-0 border-border select-none flex items-center`}>+91</span>
       <input
         value={value}
         onChange={e => onChange(sanitizePhone(e.target.value))}
         placeholder="00000 00000"
         maxLength={10}
         inputMode="numeric"
-        className={`flex-1 ${bgClass} rounded-r-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body`}
+        className="flex-1 min-w-0 bg-background border border-border rounded-r-xl px-3 h-11 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
       />
     </div>
     {error && <p className="text-xs text-destructive mt-1">{error}</p>}
@@ -59,6 +62,8 @@ const DEFAULT_DEPARTMENTS = [
 ];
 
 const ContactPage = () => {
+  const [searchParams] = useSearchParams();
+  const [tab, setTab] = useState<"message" | "complaint">(searchParams.get("type") === "complaint" ? "complaint" : "message");
   const [pageContent, setPageContent] = useState<any>(DEFAULT_CONTENT);
   const [departments, setDepartments] = useState<any[]>(DEFAULT_DEPARTMENTS);
 
@@ -138,9 +143,10 @@ const ContactPage = () => {
   };
 
   const c = pageContent;
-  const inputCls = "w-full mt-1.5 bg-card rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body";
-  const surfaceInputCls = "w-full mt-1.5 bg-surface-low rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body";
-  const labelCls = "text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider";
+  const inputCls = "w-full mt-1.5 bg-background border border-border rounded-xl px-4 h-11 text-sm outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10";
+  const surfaceInputCls = inputCls;
+  const labelCls = "text-sm font-medium text-foreground";
+  const textareaCls = `${inputCls} h-auto py-3 resize-none`;
 
   const contactSchema = {
     "@context": "https://schema.org",
@@ -169,265 +175,233 @@ const ContactPage = () => {
         jsonLd={contactSchema}
       />
 
-      {/* Hero */}
-      <section className="py-16 lg:py-24 bg-surface-low">
-        <div className="container mx-auto px-6">
-          <h1 className="font-display font-extrabold text-4xl lg:text-5xl text-foreground tracking-tight max-w-lg">
-            {c.hero_heading}
-          </h1>
-          <p className="text-muted-foreground mt-4 max-w-lg">{c.hero_subtext}</p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Contact & support"
+        title={c.hero_heading}
+        text={c.hero_subtext}
+        crumbs={[{ label: "Contact" }]}
+      />
 
-      {/* Contact Info + Form */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16">
-
-            {/* Left: contact info */}
-            <div className="space-y-8">
-              <div className="space-y-5">
-                {departments.map((dept: any) => {
-                  const Icon = ICON_MAP[dept.icon] || Phone;
-                  return (
-                    <div key={dept.label} className="flex items-start gap-4">
-                      <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center shrink-0">
-                        <Icon className="w-5 h-5 text-primary-foreground" />
-                      </div>
-                      <div>
-                        <h3 className="font-display font-bold text-foreground">{dept.label}</h3>
-                        <a
-                          href={`tel:${dept.number.replace(/\s/g, "")}`}
-                          className="text-primary font-display font-semibold text-lg mt-0.5 block"
-                        >
-                          {dept.number}
-                        </a>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* WhatsApp */}
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-success rounded-lg flex items-center justify-center shrink-0">
-                  <MessageCircle className="w-5 h-5 text-success-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-foreground">WhatsApp</h3>
-                  <p className="text-sm text-muted-foreground">Instant technical guidance.</p>
-                  <a
-                    href={`https://wa.me/${c.whatsapp_number}`}
-                    className="text-primary font-display font-semibold text-sm mt-1 inline-flex items-center gap-1"
-                  >
-                    Start Chat →
-                  </a>
-                </div>
-              </div>
-
-              {/* Email */}
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center shrink-0">
-                  <Mail className="w-5 h-5 text-accent-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-foreground">Email Support</h3>
-                  <p className="text-sm text-muted-foreground">{c.email_response_time}</p>
-                  <a href={`mailto:${c.email_support}`} className="text-primary font-display font-semibold text-sm">
-                    {c.email_support}
-                  </a>
-                </div>
-              </div>
-
-              {/* Grievance */}
-              <div className="bg-surface-low rounded-xl p-6">
-                <h4 className="font-display font-bold text-foreground">Grievance Redressal</h4>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  In accordance with the Information Technology Act, please find our designated grievance officer details for escalated concerns.
-                </p>
-                <p className="text-sm text-foreground mt-3">
-                  <strong>Officer:</strong> {c.grievance_officer_name}
-                </p>
-                <p className="text-sm text-foreground">
-                  <strong>Email:</strong> {c.grievance_officer_email}
-                </p>
-              </div>
-            </div>
-
-            {/* Right: contact form */}
-            <div className="bg-surface-low rounded-xl p-8">
-              <h3 className="font-display font-bold text-foreground text-lg mb-6">Send us a Message</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Full Name</label>
-                  <input value={form.name} onChange={e => setF("name", e.target.value)} placeholder="John Doe" className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Email Address</label>
-                  <input type="email" value={form.email} onChange={e => setF("email", e.target.value)} placeholder="john@company.com" className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Phone Number</label>
-                  <PhoneInput
-                    value={form.phone}
-                    onChange={v => { setF("phone", v); setFormPhoneError(v.length > 0 && !isPhoneValid(v) ? "Enter a valid 10-digit number." : ""); }}
-                    error={formPhoneError}
-                  />
-                </div>
-                <div>
-                  <label className={labelCls}>Order ID (Optional)</label>
-                  <input value={form.orderId} onChange={e => setF("orderId", e.target.value)} placeholder="#YUVA-0000" className={inputCls} />
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label className={labelCls}>Issue Type</label>
-                <select value={form.issueType} onChange={e => setF("issueType", e.target.value)} className={inputCls}>
-                  {issueTypes.map(t => <option key={t}>{t}</option>)}
-                </select>
-              </div>
-              {form.issueType === "Other" && (
-                <div className="mt-4">
-                  <label className={labelCls}>Specify Issue</label>
-                  <input value={form.issueTypeOther} onChange={e => setF("issueTypeOther", e.target.value)} placeholder="Briefly describe your issue..." className={inputCls} autoFocus />
-                </div>
-              )}
-
-              <div className="mt-4">
-                <label className={labelCls}>Message</label>
-                <textarea value={form.message} onChange={e => setF("message", e.target.value)} rows={4} placeholder="How can our engineers assist you today?" className={`${inputCls} resize-none`} />
-              </div>
-              <button
-                onClick={handleContactSubmit}
-                disabled={formLoading}
-                className="w-full mt-6 gradient-primary text-primary-foreground py-3.5 rounded-lg font-display font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
+      {/* Quick contacts */}
+      <section className="relative -mt-8 md:-mt-10 z-10">
+        <div className="container mx-auto px-4 md:px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {departments.map((dept: any) => {
+            const Icon = ICON_MAP[dept.icon] || Phone;
+            return (
+              <a
+                key={dept.label}
+                href={`tel:${dept.number.replace(/\s/g, "")}`}
+                className="rounded-2xl bg-card border border-border shadow-lg shadow-black/[0.04] p-5 hover:border-primary/30 transition-colors"
               >
-                {formLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</> : "Send Message"}
-              </button>
-            </div>
-          </div>
+                <span className="w-10 h-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><Icon className="w-5 h-5" /></span>
+                <p className="mt-3 text-sm text-muted-foreground">{dept.label}</p>
+                <p className="font-display font-bold text-lg">{dept.number}</p>
+              </a>
+            );
+          })}
+          <a
+            href={`https://wa.me/${c.whatsapp_number}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-2xl bg-brand-leaf text-white shadow-lg shadow-brand-leaf/20 p-5 hover:brightness-110 transition"
+          >
+            <span className="w-10 h-10 rounded-xl bg-white/20 grid place-items-center"><MessageCircle className="w-5 h-5" /></span>
+            <p className="mt-3 text-sm text-white/80">Fastest reply</p>
+            <p className="font-display font-bold text-lg">Chat on WhatsApp →</p>
+          </a>
         </div>
       </section>
 
-      {/* Complaint Form */}
-      <section className="py-16 lg:py-24 bg-surface-low">
-        <div className="container mx-auto px-6 max-w-2xl">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-destructive" />
+      {/* Forms + info */}
+      <section className="py-14 md:py-20">
+        <div className="container mx-auto px-4 md:px-6 grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-14 items-start">
+          <div className="rounded-3xl border border-border bg-card p-6 md:p-8">
+            <div role="tablist" className="inline-flex p-1 rounded-full bg-muted mb-8">
+              {([
+                ["message", "Send a message", "Message"],
+                ["complaint", "Register a complaint", "Complaint"],
+              ] as const).map(([key, label, short]) => (
+                <button
+                  key={key}
+                  role="tab"
+                  aria-selected={tab === key}
+                  onClick={() => setTab(key)}
+                  className={`h-10 px-4 sm:px-5 rounded-full text-sm font-semibold transition-colors ${tab === key ? "bg-brand-navy text-white" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  <span className="hidden sm:inline">{label}</span>
+                  <span className="sm:hidden">{short}</span>
+                </button>
+              ))}
             </div>
-            <div>
-              <h2 className="font-display font-extrabold text-2xl text-foreground tracking-tight">Register a Complaint / Feedback</h2>
-              <p className="text-sm text-muted-foreground">We take every concern seriously. Fill in the details below.</p>
-            </div>
-          </div>
 
-          <form onSubmit={handleComplaintSubmit} className="bg-card rounded-xl p-8 shadow-ambient space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            {tab === "message" ? (
               <div>
-                <label className={labelCls}>Full Name *</label>
-                <input required value={complaint.name} onChange={e => setC("name", e.target.value)} placeholder="Your name" className={surfaceInputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Order ID *</label>
-                <input required value={complaint.orderId} onChange={e => setC("orderId", e.target.value)} placeholder="#YUVA-0000" className={surfaceInputCls} />
-              </div>
-            </div>
-
-            <div>
-              <label className={labelCls}>Issue Type *</label>
-              <select required value={complaint.issueType} onChange={e => setC("issueType", e.target.value)} className={surfaceInputCls}>
-                {complaintTypes.map(t => <option key={t}>{t}</option>)}
-              </select>
-            </div>
-            {complaint.issueType === "Other" && (
-              <div>
-                <label className={labelCls}>Specify Issue *</label>
-                <input value={complaint.issueTypeOther} onChange={e => setC("issueTypeOther", e.target.value)} placeholder="Describe the type of issue..." className={surfaceInputCls} autoFocus />
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Email *</label>
-                <input required type="email" value={complaint.email} onChange={e => setC("email", e.target.value)} placeholder="your@email.com" className={surfaceInputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Phone *</label>
-                <PhoneInput
-                  value={complaint.phone}
-                  bgClass="bg-surface-low"
-                  onChange={v => { setC("phone", v); setComplaintPhoneError(v.length > 0 && !isPhoneValid(v) ? "Enter a valid 10-digit number." : ""); }}
-                  error={complaintPhoneError}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className={labelCls}>Description *</label>
-              <textarea required value={complaint.description} onChange={e => setC("description", e.target.value)} rows={5} placeholder="Please describe the issue in detail..." className={`${surfaceInputCls} resize-none`} />
-            </div>
-
-            <button
-              type="submit"
-              disabled={complaintLoading}
-              className="w-full gradient-primary text-primary-foreground py-3.5 rounded-lg font-display font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              {complaintLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</> : "Submit Complaint"}
-            </button>
-          </form>
-        </div>
-      </section>
-
-      {/* Branch + Map */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="bg-card rounded-xl p-8 shadow-ambient">
-              <h2 className="font-display font-extrabold text-2xl text-foreground tracking-tight">
-                Visit Our Main Branch
-              </h2>
-              <div className="mt-6 space-y-3">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-4 h-4 text-primary mt-1 shrink-0" />
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <p className="font-display font-semibold text-foreground text-sm">{c.branch_name}</p>
-                    <p className="text-sm text-muted-foreground">{c.branch_address}</p>
+                    <label className={labelCls}>Full name</label>
+                    <input value={form.name} onChange={e => setF("name", e.target.value)} placeholder="Your name" className={inputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Email address</label>
+                    <input type="email" value={form.email} onChange={e => setF("email", e.target.value)} placeholder="you@example.com" className={inputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Phone number</label>
+                    <PhoneInput
+                      value={form.phone}
+                      onChange={v => { setF("phone", v); setFormPhoneError(v.length > 0 && !isPhoneValid(v) ? "Enter a valid 10-digit number." : ""); }}
+                      error={formPhoneError}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Order ID <span className="text-muted-foreground font-normal">(optional)</span></label>
+                    <input value={form.orderId} onChange={e => setF("orderId", e.target.value)} placeholder="#YUVA-0000" className={inputCls} />
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="w-4 h-4 text-primary shrink-0" />
-                  <p className="text-sm text-muted-foreground">{c.branch_hours}</p>
+
+                <div className="mt-4">
+                  <label className={labelCls}>What can we help with?</label>
+                  <select value={form.issueType} onChange={e => setF("issueType", e.target.value)} className={inputCls}>
+                    {issueTypes.map(t => <option key={t}>{t}</option>)}
+                  </select>
                 </div>
+                {form.issueType === "Other" && (
+                  <div className="mt-4">
+                    <label className={labelCls}>Specify issue</label>
+                    <input value={form.issueTypeOther} onChange={e => setF("issueTypeOther", e.target.value)} placeholder="Briefly describe your issue..." className={inputCls} autoFocus />
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  <label className={labelCls}>Message</label>
+                  <textarea value={form.message} onChange={e => setF("message", e.target.value)} rows={4} placeholder="Tell us what you need…" className={textareaCls} />
+                </div>
+                <button
+                  onClick={handleContactSubmit}
+                  disabled={formLoading}
+                  className="w-full mt-6 bg-brand-navy text-white h-12 rounded-full font-semibold hover:bg-brand-navy-soft transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {formLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</> : "Send message"}
+                </button>
               </div>
-              
-              <a
-                href={c.branch_maps_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-6 gradient-primary text-primary-foreground px-6 py-2.5 rounded-lg font-display font-semibold text-sm hover:opacity-90 transition-opacity"
-              >
-                Get Directions
-              </a>
+            ) : (
+              <form onSubmit={handleComplaintSubmit} className="space-y-4">
+                <p className="flex items-start gap-2 text-sm text-muted-foreground rounded-xl bg-muted/70 p-3">
+                  <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                  We take every concern seriously. Include your order ID so we can resolve it quickly.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Full name *</label>
+                    <input required value={complaint.name} onChange={e => setC("name", e.target.value)} placeholder="Your name" className={surfaceInputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Order ID *</label>
+                    <input required value={complaint.orderId} onChange={e => setC("orderId", e.target.value)} placeholder="#YUVA-0000" className={surfaceInputCls} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Issue type *</label>
+                  <select required value={complaint.issueType} onChange={e => setC("issueType", e.target.value)} className={surfaceInputCls}>
+                    {complaintTypes.map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+                {complaint.issueType === "Other" && (
+                  <div>
+                    <label className={labelCls}>Specify issue *</label>
+                    <input value={complaint.issueTypeOther} onChange={e => setC("issueTypeOther", e.target.value)} placeholder="Describe the type of issue..." className={surfaceInputCls} autoFocus />
+                  </div>
+                )}
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Email *</label>
+                    <input required type="email" value={complaint.email} onChange={e => setC("email", e.target.value)} placeholder="you@example.com" className={surfaceInputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Phone *</label>
+                    <PhoneInput
+                      value={complaint.phone}
+                      onChange={v => { setC("phone", v); setComplaintPhoneError(v.length > 0 && !isPhoneValid(v) ? "Enter a valid 10-digit number." : ""); }}
+                      error={complaintPhoneError}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Description *</label>
+                  <textarea required value={complaint.description} onChange={e => setC("description", e.target.value)} rows={5} placeholder="Please describe the issue in detail..." className={textareaCls} />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={complaintLoading}
+                  className="w-full bg-brand-navy text-white h-12 rounded-full font-semibold hover:bg-brand-navy-soft transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {complaintLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</> : "Submit complaint"}
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* Info column */}
+          <div className="space-y-4">
+            <div className="rounded-3xl overflow-hidden border border-border bg-card">
+              <div className="aspect-[4/3] bg-muted">
+                {c.branch_maps_embed && (
+                  <iframe
+                    src={c.branch_maps_embed}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={true}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Yuva Computers head office location"
+                  />
+                )}
+              </div>
+              <div className="p-6 space-y-3">
+                <h2 className="font-display font-bold text-xl">{c.branch_name}</h2>
+                <p className="flex items-start gap-3 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4 text-brand-leaf-dark mt-0.5 shrink-0" /> {c.branch_address}
+                </p>
+                <p className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Clock className="w-4 h-4 text-brand-leaf-dark shrink-0" /> {c.branch_hours}
+                </p>
+                <a
+                  href={c.branch_maps_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center h-10 px-5 rounded-full bg-brand-navy text-white text-sm font-semibold"
+                >
+                  Get directions
+                </a>
+              </div>
             </div>
 
-            <div className="bg-surface-high rounded-xl overflow-hidden aspect-[4/3] shadow-ambient">
-              {c.branch_maps_embed ? (
-                <iframe
-                  src={c.branch_maps_embed}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen={true}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Yuva Computers Location"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
-                  Map not configured
-                </div>
-              )}
+            <div className="rounded-3xl border border-border bg-card p-6">
+              <h3 className="font-display font-bold flex items-center gap-2"><Mail className="w-4 h-4 text-primary" /> Email support</h3>
+              <a href={`mailto:${c.email_support}`} className="mt-1 block font-semibold text-primary">{c.email_support}</a>
+              <p className="text-sm text-muted-foreground">{c.email_response_time}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {SOCIAL_LINKS.map(({ label, handle, href }) => (
+                  <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="h-9 px-3.5 inline-flex items-center rounded-full bg-muted text-xs font-semibold hover:bg-muted/70">
+                    {label} {handle.startsWith("@") ? handle : ""}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-muted/70 p-6 text-sm">
+              <h3 className="font-display font-bold text-foreground">Grievance redressal</h3>
+              <p className="text-muted-foreground mt-2 leading-relaxed">
+                In accordance with the Information Technology Act, escalated concerns can be sent to our grievance officer.
+              </p>
+              <p className="mt-3"><span className="text-muted-foreground">Officer:</span> <strong>{c.grievance_officer_name}</strong></p>
+              <p><span className="text-muted-foreground">Email:</span> <strong>{c.grievance_officer_email}</strong></p>
+              <p className="mt-3 text-muted-foreground">GSTIN: <span className="font-mono text-foreground">{SITE.gstin}</span></p>
             </div>
           </div>
         </div>

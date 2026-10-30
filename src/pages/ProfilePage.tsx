@@ -135,7 +135,7 @@ export default function ProfilePage() {
   return (
     <>
     <SEO title="My Account & Orders | Yuva Computers" noindex={true} />
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/50">
       <div className="container mx-auto px-4 md:px-6 py-10 max-w-4xl">
 
         {/* Header */}
@@ -145,7 +145,7 @@ export default function ProfilePage() {
               {(user.first_name || user.email).charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="font-display font-bold text-xl text-foreground">
+              <h1 className="font-display font-extrabold text-2xl tracking-tight text-foreground">
                 {user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : 'My Account'}
               </h1>
               <p className="text-sm text-muted-foreground">{user.email}</p>
@@ -160,7 +160,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 bg-muted/30 rounded-xl p-1 border border-border/30">
+        <div className="flex gap-1 mb-6 bg-muted rounded-full p-1">
           {([
             { key: 'profile', label: 'Profile', icon: User },
             { key: 'orders', label: `Orders${totalOrders > 0 ? ` (${totalOrders})` : ''}`, icon: Package },
@@ -169,7 +169,7 @@ export default function ProfilePage() {
             <button
               key={key}
               onClick={() => switchTab(key)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === key ? 'bg-card text-foreground shadow-sm font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-full text-sm font-semibold transition-all ${tab === key ? 'bg-brand-navy text-white' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <Icon className="w-4 h-4" />
               <span className="hidden sm:block">{label}</span>
@@ -179,7 +179,7 @@ export default function ProfilePage() {
 
         {/* ── PROFILE TAB ── */}
         {tab === 'profile' && (
-          <div className="bg-card rounded-2xl border border-border/30 p-6 space-y-6">
+          <div className="bg-card rounded-2xl border border-border p-6 space-y-6">
             <h2 className="font-display font-bold text-foreground">Personal Information</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
@@ -192,7 +192,7 @@ export default function ProfilePage() {
                   <input
                     value={(profileForm as any)[key]}
                     onChange={e => setProfileForm(f => ({ ...f, [key]: e.target.value }))}
-                    className="w-full border border-border/30 rounded-xl px-4 py-2.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               ))}
@@ -201,7 +201,7 @@ export default function ProfilePage() {
                 <input value={user.email} disabled className="w-full border border-border/20 rounded-xl px-4 py-2.5 text-sm bg-muted/30 text-muted-foreground cursor-not-allowed" />
               </div>
             </div>
-            <button onClick={handleSaveProfile} disabled={savingProfile} className="gradient-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60 hover:opacity-90 transition">
+            <button onClick={handleSaveProfile} disabled={savingProfile} className="bg-brand-navy text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60 hover:opacity-90 transition">
               {savingProfile ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
@@ -213,11 +213,11 @@ export default function ProfilePage() {
             {ordersLoading ? (
               <div className="text-center py-16 text-muted-foreground">Loading orders...</div>
             ) : orders.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-2xl border border-border/30">
+              <div className="text-center py-16 bg-card rounded-2xl border border-border">
                 <Package className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
                 <p className="font-semibold text-foreground">No orders yet</p>
                 <p className="text-sm text-muted-foreground mt-1 mb-4">Your order history will appear here.</p>
-                <Link to="/products" className="gradient-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold">Shop Now</Link>
+                <Link to="/products" className="bg-brand-navy text-white px-6 py-2.5 rounded-xl text-sm font-bold">Shop Now</Link>
               </div>
             ) : (
               <>
@@ -228,7 +228,7 @@ export default function ProfilePage() {
                   const firstItem = order.items?.[0];
 
                   return (
-                    <div key={order.id} className="bg-card rounded-2xl border border-border/30 overflow-hidden">
+                    <div key={order.id} className="bg-card rounded-2xl border border-border overflow-hidden">
                       
                       {/* ── Collapsed View (Amazon-style) ── */}
                       <div
@@ -455,7 +455,7 @@ export default function ProfilePage() {
                               </div>
                               {req.admin_notes && <p className="text-sm text-foreground mb-3">{req.admin_notes}</p>}
                               {req.exchange_code && (
-                                <div className="bg-card rounded-lg p-3 border border-border/30">
+                                <div className="bg-card rounded-lg p-3 border border-border">
                                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Your Exchange Code</p>
                                   <p className="font-mono font-bold text-2xl text-primary tracking-widest mt-1">{req.exchange_code.code}</p>
                                   <p className="text-xs text-muted-foreground mt-1">
@@ -488,7 +488,7 @@ export default function ProfilePage() {
                             {order.can_request_return && order.return_requests?.length === 0 && (
                               <button
                                 onClick={() => setReturnModal({ open: true, orderId: order.id })}
-                                className="flex items-center gap-2 text-sm font-medium text-muted-foreground border border-border/30 px-4 py-2 rounded-xl hover:bg-muted transition"
+                                className="flex items-center gap-2 text-sm font-medium text-muted-foreground border border-border px-4 py-2 rounded-xl hover:bg-muted transition"
                               >
                                 <RotateCcw className="w-4 h-4" />
                                 Request Exchange / Upgrade
@@ -507,7 +507,7 @@ export default function ProfilePage() {
                     <button
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="p-2 rounded-lg border border-border/30 hover:bg-muted transition disabled:opacity-40"
+                      className="p-2 rounded-lg border border-border hover:bg-muted transition disabled:opacity-40"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -517,7 +517,7 @@ export default function ProfilePage() {
                     <button
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg border border-border/30 hover:bg-muted transition disabled:opacity-40"
+                      className="p-2 rounded-lg border border-border hover:bg-muted transition disabled:opacity-40"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -530,7 +530,7 @@ export default function ProfilePage() {
 
         {/* ── ADDRESSES TAB ── */}
         {tab === 'addresses' && (
-          <div className="bg-card rounded-2xl border border-border/30 p-6">
+          <div className="bg-card rounded-2xl border border-border p-6">
             <AddressManager />
           </div>
         )}
@@ -539,7 +539,7 @@ export default function ProfilePage() {
       {/* Return Request Modal */}
       {returnModal.open && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card rounded-2xl border border-border/30 shadow-2xl w-full max-w-lg p-6 space-y-5">
+          <div className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-lg p-6 space-y-5">
             <div>
               <h2 className="font-display font-bold text-xl text-foreground">Request Exchange / Upgrade</h2>
               <p className="text-sm text-muted-foreground mt-1">Only for product defects. No refunds — exchange or upgrade only.</p>
@@ -565,7 +565,7 @@ export default function ProfilePage() {
                   <button
                     key={type}
                     onClick={() => setReturnForm(f => ({ ...f, request_type: type }))}
-                    className={`p-3 rounded-xl border-2 text-left transition-all ${returnForm.request_type === type ? 'border-primary bg-primary/5' : 'border-border/30 hover:border-border'}`}
+                    className={`p-3 rounded-xl border-2 text-left transition-all ${returnForm.request_type === type ? 'border-primary bg-primary/5' : 'border-border hover:border-border'}`}
                   >
                     <p className="text-sm font-bold text-foreground">{type}</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">{type === 'Exchange' ? 'Same value replacement' : 'Higher value upgrade'}</p>
@@ -581,7 +581,7 @@ export default function ProfilePage() {
                 value={returnForm.defect_description}
                 onChange={e => setReturnForm(f => ({ ...f, defect_description: e.target.value }))}
                 placeholder="Describe clearly. E.g. Screen has dead pixels on the right side, noticed after 2 days of use."
-                className="w-full border border-border/30 rounded-xl px-4 py-3 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                className="w-full border border-border rounded-xl px-4 py-3 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
             </div>
 
@@ -591,16 +591,16 @@ export default function ProfilePage() {
                 value={returnForm.defect_video_url}
                 onChange={e => setReturnForm(f => ({ ...f, defect_video_url: e.target.value }))}
                 placeholder="YouTube or Google Drive link"
-                className="w-full border border-border/30 rounded-xl px-4 py-2.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full border border-border rounded-xl px-4 py-2.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <p className="text-[10px] text-muted-foreground mt-1">A video significantly speeds up the review process.</p>
             </div>
 
             <div className="flex gap-3">
-              <button onClick={handleSubmitReturn} disabled={submittingReturn} className="flex-1 gradient-primary text-primary-foreground py-3 rounded-xl font-bold text-sm disabled:opacity-60">
+              <button onClick={handleSubmitReturn} disabled={submittingReturn} className="flex-1 bg-brand-navy text-white py-3 rounded-xl font-bold text-sm disabled:opacity-60">
                 {submittingReturn ? 'Submitting...' : 'Submit Request'}
               </button>
-              <button onClick={() => setReturnModal({ open: false, orderId: null })} className="px-5 py-3 rounded-xl border border-border/30 text-sm text-muted-foreground hover:bg-muted transition">
+              <button onClick={() => setReturnModal({ open: false, orderId: null })} className="px-5 py-3 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted transition">
                 Cancel
               </button>
             </div>

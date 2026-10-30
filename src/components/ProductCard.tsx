@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Star, Laptop, BadgeCheck, ArrowRight } from "lucide-react";
-import { type ApiProduct, getCardPrice, getSpecBadges } from "@/types/product";
+import { type ApiProduct, getCardPrice, getPrimaryVariant } from "@/types/product";
+import { normalizeProcessor, normalizeSize } from "@/lib/specs";
 
 const conditionStyles: Record<string, string> = {
   like_new: "bg-brand-leaf text-white",
@@ -44,7 +45,14 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
   // ── Spec chips for the cheapest variant (processor / RAM / storage) ─────
   // Variants are the single source of truth; products without variants
   // fall back to their display size only.
-  const specs = getSpecBadges(product);
+  const primary = getPrimaryVariant(product);
+  const specs = primary
+    ? [
+        primary.processor && normalizeProcessor(primary.processor),
+        primary.ram && `${normalizeSize(primary.ram)} RAM`,
+        primary.storage && normalizeSize(primary.storage),
+      ].filter(Boolean) as string[]
+    : [];
   const variantCount = product.variants?.length ?? 0;
   const chips = specs.length > 0 ? specs : [product.display].filter(Boolean) as string[];
 
@@ -72,7 +80,7 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
         </div>
       </Link>
 
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-3 sm:p-4 flex flex-col flex-1">
         <div className="flex items-center justify-between gap-2 mb-1.5">
           <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider truncate">
             {product.brand_name}
@@ -88,7 +96,7 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
         </div>
 
         <Link to={`/product/${product.slug}`}>
-          <h3 className="font-display font-bold text-foreground text-[15px] leading-snug line-clamp-2 min-h-[2.6em] hover:text-primary transition-colors">
+          <h3 className="font-display font-bold text-foreground text-sm sm:text-[15px] leading-snug line-clamp-2 min-h-[2.6em] hover:text-primary transition-colors">
             {product.title}
           </h3>
         </Link>
@@ -111,7 +119,7 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
         <div className="mt-auto pt-4">
           <p className="text-[11px] text-muted-foreground">{variantCount > 1 ? "Starting from" : "Price"}</p>
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="font-display font-extrabold text-xl text-foreground">
+            <span className="font-display font-extrabold text-lg sm:text-xl text-foreground">
               ₹{price.toLocaleString("en-IN")}
             </span>
             {hasDiscount && (
@@ -120,7 +128,7 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
               </span>
             )}
           </div>
-          <p className="flex items-center gap-1 mt-1 text-[11px] font-medium text-brand-leaf-dark">
+          <p className="hidden sm:flex items-center gap-1 mt-1 text-[11px] font-medium text-brand-leaf-dark">
             <BadgeCheck className="w-3.5 h-3.5" /> 50-point quality checked
           </p>
 

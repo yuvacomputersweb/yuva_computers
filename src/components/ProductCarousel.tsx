@@ -25,7 +25,7 @@ const ProductCarousel = ({ products, title }: ProductCarouselProps) => {
 
   return (
     <div className="relative group/carousel w-full">
-      {title && <h2 className="font-display font-extrabold text-2xl md:text-3xl mb-8">{title}</h2>}
+      {title && <h2 className="font-display font-extrabold text-2xl md:text-3xl tracking-tight mb-6">{title}</h2>}
       
       <button
         onClick={() => scroll("left")}

@@ -1,5 +1,6 @@
 import { Phone, Mail, ShieldCheck } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import PageHero from "@/components/PageHero";
 
 const POLICY_SECTIONS = [
   {
@@ -154,24 +155,16 @@ const ReturnRefundPolicyPage = () => {
         jsonLd={policySchema}
       />
 
-      {/* Hero */}
-      <section className="py-16 lg:py-24 bg-surface-low">
-        <div className="container mx-auto px-6">
-          <h1 className="font-display font-extrabold text-4xl lg:text-5xl text-foreground tracking-tight max-w-3xl">
-            Return & Refund Policy
-          </h1>
-          <p className="text-muted-foreground mt-4 max-w-2xl">
-            This policy applies to purchases made through yuvacomputers.in and
-            to orders placed remotely by phone or WhatsApp. Purchases made in
-            person at a Yuva branch are governed by the terms printed on the
-            invoice.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Policies"
+        title="Return &amp; Refund Policy"
+        text="This policy applies to purchases made through yuvacomputers.in and to orders placed remotely by phone or WhatsApp. Purchases made in person at a Yuva branch are governed by the terms printed on the invoice."
+        crumbs={[{ label: "Return & refund policy" }]}
+      />
 
       {/* Sections */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-6 max-w-3xl">
+      <section className="py-12 md:py-20">
+        <div className="container mx-auto px-4 md:px-6 max-w-3xl">
           <div className="space-y-10">
             {POLICY_SECTIONS.map((section) => (
               <div key={section.title}>
@@ -190,7 +183,7 @@ const ReturnRefundPolicyPage = () => {
           </div>
 
           {/* Contact */}
-          <div className="mt-16 bg-surface-low rounded-xl p-8">
+          <div className="mt-16 bg-muted/60 rounded-3xl p-6 md:p-8">
             <h2 className="font-display font-extrabold text-xl text-foreground tracking-tight mb-4">
               14. Contact
             </h2>
@@ -202,7 +195,7 @@ const ReturnRefundPolicyPage = () => {
               {CONTACTS.map((c) => (
                 <div
                   key={c.label}
-                  className="flex items-start gap-3 bg-card rounded-lg p-4"
+                  className="flex items-start gap-3 bg-card rounded-2xl border border-border p-4"
                 >
                   <Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                   <div>
@@ -212,7 +205,7 @@ const ReturnRefundPolicyPage = () => {
                 </div>
               ))}
             </div>
-            <div className="flex items-start gap-3 mt-4 bg-card rounded-lg p-4">
+            <div className="flex items-start gap-3 mt-4 bg-card rounded-2xl border border-border p-4">
               <Mail className="w-4 h-4 text-primary mt-0.5 shrink-0" />
               <div>
                 <p className="font-display font-semibold text-foreground text-sm">Email</p>

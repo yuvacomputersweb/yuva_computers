@@ -161,11 +161,11 @@ export const storeService = {
     (await api.get(`/store/products/${slug}/`)).data,
 
   getCategories: async (params?: any) =>
-    (await api.get('/store/categories/', { params })).data,
+    params ? (await api.get('/store/categories/', { params })).data : cachedGet('/store/categories/'),
 
   
-  getBrands: async () => (await api.get('/store/brands/')).data,
-  getUsageTags: async () => (await api.get('/store/usage-tags/')).data,
+  getBrands: async () => cachedGet('/store/brands/'),
+  getUsageTags: async () => cachedGet('/store/usage-tags/'),
   getReviews: async (slug: string) =>
     (await api.get(`/store/products/${slug}/reviews/`)).data,
   addReview: async (slug: string, formData: FormData) =>
@@ -218,22 +218,35 @@ export const orderService = {
   (await api.post(`/orders/${orderId}/cancel/`)).data,
 };
 
+// ─── SESSION CACHE ───────────────────────────────────────────────────────────
+// Site-wide data (menus, stores, page content) rarely changes while someone
+// browses, and several components ask for the same endpoint on every page.
+// Sharing one in-flight request per URL keeps visitors well under the API's
+// per-IP rate limit. Failed requests are dropped so they can be retried.
+const cache = new Map<string, Promise<any>>();
+const cachedGet = (url: string) => {
+  if (!cache.has(url)) {
+    cache.set(url, api.get(url).then((r) => r.data).catch((err) => { cache.delete(url); throw err; }));
+  }
+  return cache.get(url)!;
+};
+
 // ─── CONTENT ─────────────────────────────────────────────────────────────────
 export const contentService = {
   getHomeContent: async () =>
-    (await api.get('/content/home/')).data,
+    cachedGet('/content/home/'),
 
   getCompanyContent: async () =>
-    (await api.get('/content/company/')).data,
+    cachedGet('/content/company/'),
 
   getBulkOrderContent: async () =>
-    (await api.get('/content/bulk-orders/')).data,
+    cachedGet('/content/bulk-orders/'),
 
   getStoresContent: async () =>
-    (await api.get('/content/stores/')).data,
+    cachedGet('/content/stores/'),
 
   getContactContent: async () =>
-    (await api.get('/content/contact/')).data,
+    cachedGet('/content/contact/'),
   getBlogsContent: async (limit?: number) => {
   const params = limit ? { limit } : {};
   return (await api.get('/content/blogs/', { params })).data;

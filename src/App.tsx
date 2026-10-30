@@ -18,8 +18,8 @@ import StoresPage from "@/pages/StoresPage";
 import ContactPage from "@/pages/ContactPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import NotFound from "@/pages/NotFound";
-import StateStoresPage from "@/pages/StateStoresPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
+import BlogsPage from "@/pages/BlogsPage";
 import FaqPage from "@/pages/FaqPage";
 import ReturnRefundPolicyPage from "@/pages/ReturnRefundPolicyPage";
 import ShippingPolicyPage from "@/pages/ShippingPolicyPage";
@@ -47,17 +47,18 @@ const App = () => (
                 <Route path="/bulk-orders" element={<BulkOrdersPage />} />
                 <Route path="/company" element={<CompanyPage />} />
                 <Route path="/stores" element={<StoresPage />} />
-                <Route path="/stores/:state" element={<StateStoresPage />} />
+                <Route path="/stores/:state" element={<StoresPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/blogs" element={<BlogsPage />} />
                 <Route path="/blogs/:slug" element={<BlogDetailPage />} />
                 <Route path="/faq" element={<FaqPage />} />
                 <Route path="/returns-refund-policy" element={<ReturnRefundPolicyPage />} />
                 <Route path="/shipping-policy" element={<ShippingPolicyPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="*" element={<NotFound />} />
               </Route>
-              <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </CartProvider>

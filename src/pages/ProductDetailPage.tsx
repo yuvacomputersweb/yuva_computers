@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Loader2, FileText, CheckCircle, HelpCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronRight, ArrowRight, PackageSearch } from "lucide-react";
 import { storeService } from "@/services/api";
 import { toast } from "sonner";
 import ImageGallery from "@/components/product/ImageGallery";
@@ -44,13 +45,32 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-10 h-10" />
+      <div className="container mx-auto px-4 md:px-6 py-10 grid lg:grid-cols-2 gap-10">
+        <div className="aspect-square rounded-3xl bg-muted animate-pulse" />
+        <div className="space-y-4">
+          <div className="h-6 w-32 rounded-full bg-muted animate-pulse" />
+          <div className="h-10 w-3/4 rounded-xl bg-muted animate-pulse" />
+          <div className="h-28 rounded-2xl bg-muted animate-pulse" />
+          <div className="h-40 rounded-2xl bg-muted animate-pulse" />
+        </div>
       </div>
     );
   }
 
-  if (!product) return null;
+  if (!product) {
+    return (
+      <div className="container mx-auto px-4 py-24 text-center">
+        <span className="mx-auto w-14 h-14 rounded-2xl bg-muted grid place-items-center text-muted-foreground">
+          <PackageSearch className="w-7 h-7" />
+        </span>
+        <h1 className="mt-5 font-display font-extrabold text-2xl">This product isn’t available</h1>
+        <p className="mt-2 text-muted-foreground">It may have just been sold. Have a look at what’s in stock now.</p>
+        <Link to="/products" className="mt-6 inline-flex items-center gap-2 h-11 px-6 rounded-full bg-brand-navy text-white font-semibold">
+          Browse laptops <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+    );
+  }
 
   // Safe evaluations after product loading is confirmed
   const productName = product.name || product.title || product.product_name || "Refurbished Laptop";
@@ -135,60 +155,46 @@ export default function ProductDetailPage() {
         ogImage={productImage}
         jsonLd={productSchema}
       />
-      <div className="container mx-auto px-4 py-10 space-y-8">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
-          <ImageGallery product={product} />
-          <div className="space-y-6">
-            <ProductInfo product={product} onVariantChange={setActiveVariant} />
-            <TrustBadges product={product} />
+      <div className="container mx-auto px-4 md:px-6 pt-5 pb-24 lg:pb-16 space-y-12 md:space-y-16">
+        <div>
+          <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-5 overflow-hidden" aria-label="Breadcrumb">
+            <Link to="/" className="hover:text-foreground shrink-0">Home</Link>
+            <ChevronRight className="w-3 h-3 shrink-0" />
+            <Link to="/products" className="hover:text-foreground shrink-0">Shop</Link>
+            <ChevronRight className="w-3 h-3 shrink-0" />
+            <span className="truncate text-foreground">{productName}</span>
+          </nav>
 
-            {/* Mobile Description Block */}
-            <div className="lg:hidden space-y-8 pt-4">
-              <div className="prose max-w-none text-muted-foreground">
-                <h4 className="font-bold text-foreground flex items-center gap-2 mb-2 text-sm">
-                  <FileText className="w-5 h-5 text-primary" /> Overview
-                </h4>
-                <p className="whitespace-pre-line text-sm">{product.description}</p>
-              </div>
-
-              {product.highlights_list?.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-foreground mb-4 text-sm">Key Highlights</h4>
-                  <div className="grid gap-3">
-                    {product.highlights_list.map((h: string, i: number) => (
-                      <div key={i} className="flex items-start gap-3 bg-card p-3 rounded-lg border">
-                        <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                        <span className="text-sm">{h}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          <div className="grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-14 items-start">
+            <div className="lg:sticky lg:top-40">
+              <ImageGallery product={product} />
+            </div>
+            <div className="space-y-6">
+              <ProductInfo product={product} onVariantChange={setActiveVariant} />
+              <TrustBadges product={product} />
             </div>
           </div>
         </div>
 
-        <div className="block">
-          <ProductTabs product={product} slug={slug!} />
+        <ProductTabs product={product} slug={slug!} />
+
+        <div id="reviews" className="scroll-mt-40">
+          <ReviewSection product={product} activeVariant={activeVariant} />
         </div>
 
         {related.length > 0 && (
-          <section className="mt-16">
-            <ProductCarousel products={related} title="You May Also Like" />
+          <section>
+            <ProductCarousel products={related} title="You may also like" />
           </section>
         )}
-        <ReviewSection product={product} activeVariant={activeVariant} />
 
         {/* FAQ Section */}
-        <section className="mt-16">
-          <div className="max-w-3xl mx-auto">
+        <section>
+          <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center shrink-0">
-                <HelpCircle className="w-5 h-5 text-primary-foreground" />
-              </div>
               <div>
-                <h2 className="font-display font-extrabold text-2xl text-foreground tracking-tight">
-                  Frequently Asked Questions
+                <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight">
+                  Questions about buying refurbished
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   Common questions about buying refurbished laptops from Yuva Computers.
@@ -197,9 +203,9 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="space-y-10">
-              {FAQ_SECTIONS.map((section) => (
+              {FAQ_SECTIONS.slice(0, 2).map((section) => (
                 <div key={section.title}>
-                  <h3 className="font-display font-extrabold text-xl text-foreground tracking-tight mb-4">
+                  <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-brand-leaf-dark mb-2">
                     {section.title}
                   </h3>
                   <Accordion type="single" collapsible>
@@ -220,6 +226,9 @@ export default function ProductDetailPage() {
                 </div>
               ))}
             </div>
+            <Link to="/faq" className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+              See all FAQs <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </section>
       </div>

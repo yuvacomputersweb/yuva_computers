@@ -12,7 +12,17 @@ export const SITE = {
   since: 2009,
   googleRating: "4.4",
   googleReviewsUrl: "https://share.google/W5RdRfHaAWY1fKw1C",
+  gstin: "36AHLPJ3987B3Z4",
+  headOffice: "Dilsukhnagar, Hyderabad, Telangana",
+  headOfficeAddress: "Sai Towers, 204, 2nd Floor, Metro Pillar No. 1519, Dilsukhnagar, Hyderabad, Telangana 500060",
+  hours: "Open daily, 10:00 AM – 8:30 PM",
 };
+
+export const SOCIAL_LINKS = [
+  { label: "Instagram", handle: "@yuva.computers", href: "https://www.instagram.com/yuva.computers" },
+  { label: "YouTube", handle: "@yuvacomputers", href: "https://youtube.com/@yuvacomputers" },
+  { label: "Facebook", handle: "Yuva Computers", href: "https://www.facebook.com/share/1ZcCzs87wv/" },
+] as const;
 
 export const whatsappLink = (text = "Hi Yuva Computers, I'd like to know more about your laptops.") =>
   `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`;

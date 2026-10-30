@@ -7,11 +7,10 @@ import {
   Facebook,
   Instagram,
   Youtube,
-  Heart,
   MessageCircle,
 } from "lucide-react";
 import { storeService } from "@/services/api";
-import { SITE, whatsappLink } from "@/lib/site";
+import { SITE, SOCIAL_LINKS, whatsappLink } from "@/lib/site";
 import BrandLogo from "./BrandLogo";
 
 const FooterColumn = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -22,6 +21,8 @@ const FooterColumn = ({ title, children }: { title: string; children: React.Reac
 );
 
 const linkClass = "hover:text-white transition-colors";
+
+const SOCIAL_ICONS = { Instagram, YouTube: Youtube, Facebook };
 
 const Footer = () => {
   const [categories, setCategories] = useState<any[]>([]);
@@ -59,8 +60,13 @@ const Footer = () => {
               <a href={`mailto:${SITE.email}`} className={`flex items-center gap-3 ${linkClass}`}>
                 <Mail className="w-4 h-4 text-brand-leaf" /> {SITE.email}
               </a>
-              <p className="flex items-center gap-3">
-                <MapPin className="w-4 h-4 text-brand-leaf" /> Head office: Dilsukhnagar, Hyderabad
+              <p className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-brand-leaf shrink-0 mt-0.5" />
+                <span>
+                  <span className="block text-white/90">Head office</span>
+                  {SITE.headOfficeAddress}
+                  <span className="block text-white/50 mt-1">{SITE.hours}</span>
+                </span>
               </p>
             </div>
 
@@ -73,22 +79,22 @@ const Footer = () => {
               >
                 <MessageCircle className="w-4 h-4" /> WhatsApp us
               </a>
-              {[
-                { href: "https://www.facebook.com/share/1ZcCzs87wv/", icon: Facebook, label: "Facebook" },
-                { href: "https://www.instagram.com/yuva.computers", icon: Instagram, label: "Instagram" },
-                { href: "https://youtube.com/@yuvacomputers", icon: Youtube, label: "YouTube" },
-              ].map(({ href, icon: Icon, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="w-10 h-10 grid place-items-center rounded-full border border-white/15 hover:bg-white/10"
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))}
+              {SOCIAL_LINKS.map(({ href, label, handle }) => {
+                const Icon = SOCIAL_ICONS[label];
+                return (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${label} ${handle}`}
+                    title={`${label} ${handle}`}
+                    className="w-10 h-10 grid place-items-center rounded-full border border-white/15 hover:bg-white/10"
+                  >
+                    <Icon className="w-4 h-4" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -122,15 +128,17 @@ const Footer = () => {
         </div>
 
         {/* BOTTOM */}
-        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/40">
+        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/50 text-center">
           <p>© {new Date().getFullYear()} Yuva Computers. All rights reserved.</p>
-
-          {/* STAFFARC CREDIT */}
-          <p className="flex items-center gap-1">
-            Made with <Heart className="h-3.5 w-3.5 text-red-500" /> by
-            <a href="https://staffarc.in" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white">
-              StaffArc
-            </a>
+          <p>
+            GSTIN: <span className="font-mono text-white/70 select-all">{SITE.gstin}</span>
+          </p>
+          <p className="flex items-center gap-3">
+            {SOCIAL_LINKS.map(({ href, label, handle }) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                {handle}
+              </a>
+            ))}
           </p>
         </div>
       </div>

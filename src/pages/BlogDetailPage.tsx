@@ -98,18 +98,21 @@ const BlogDetailPage = () => {
         ogImage={blog.cover_image}
         jsonLd={blogSchema}
       />
-      <main className="bg-background min-h-screen pb-20">
+      <article className="pb-20">
         {/* Cover */}
-        <div className="w-full h-64 md:h-[420px] overflow-hidden bg-surface-low">
+        <div className="container mx-auto px-4 md:px-6 pt-6">
+          <div className="w-full aspect-[21/9] max-h-[460px] rounded-3xl overflow-hidden bg-muted">
           <img
             src={blog.cover_image}
             alt={blog.title}
             className="w-full h-full object-cover"
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
           />
+          </div>
         </div>
 
         {/* Content */}
-        <div className="container mx-auto px-6 max-w-3xl mt-10">
+        <div className="container mx-auto px-4 md:px-6 max-w-3xl mt-10">
           <Link
             to="/blogs"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
@@ -128,20 +131,29 @@ const BlogDetailPage = () => {
             </span>
           </div>
 
-          <h1 className="font-display font-extrabold text-2xl md:text-4xl text-foreground tracking-tight mb-6">
+          <h1 className="font-display font-extrabold text-3xl md:text-5xl text-foreground tracking-tight leading-tight mb-8">
             {blog.title}
           </h1>
 
           <div className="flex flex-col gap-5">
             {Array.isArray(blog.paragraphs) &&
               blog.paragraphs.map((para: string, i: number) => (
-                <p key={i} className="text-base text-foreground/80 leading-relaxed">
+                <p key={i} className="text-base md:text-lg text-foreground/80 leading-relaxed">
                   {para}
                 </p>
               ))}
           </div>
+
+          <aside className="mt-14 rounded-3xl bg-brand-navy text-white p-8">
+            <h2 className="font-display font-extrabold text-2xl">Ready to pick your laptop?</h2>
+            <p className="mt-2 text-white/70">Every Yuva laptop is 50-point quality checked and sold with warranty.</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link to="/products" className="inline-flex items-center h-11 px-5 rounded-full bg-brand-leaf font-semibold">Shop laptops</Link>
+              <Link to="/stores" className="inline-flex items-center h-11 px-5 rounded-full border border-white/25 font-semibold hover:bg-white/10">Visit a store</Link>
+            </div>
+          </aside>
         </div>
-      </main>
+      </article>
     </>
   );
 };
