@@ -12,7 +12,7 @@ const POLICY_SECTIONS = [
   {
     title: "2. Return Window",
     body: [
-      "Online and remote orders: You may raise a return request within 7 calendar days from the date of delivery.",
+      "Online and remote orders: If the device arrives damaged or develops any problem, you may raise a replacement request within 15 calendar days from the date of delivery.",
       "In-store purchases: As stated on the invoice, goods sold in store are not returnable. In-store purchases are protected instead by the 15-day testing warranty, which entitles you to repair or replacement of a defective unit — not a refund.",
     ],
   },
@@ -121,7 +121,7 @@ const POLICY_SECTIONS = [
     title: "13. Relationship to Warranty",
     body: [
       "This return policy and our warranty are separate protections.",
-      "The return window (7 days, online orders) covers defective, damaged, or incorrect deliveries.",
+      "The replacement window (15 days, online orders) covers damaged, defective, or incorrect deliveries.",
       "The warranty continues after the return window and covers RAM and hard disk free replacement for 1 year, motherboard repair for 1 year, and free service for the life of your ownership. Apple laptops from Yuva iStore carry 6 months free service warranty.",
     ],
   },
@@ -150,7 +150,7 @@ const ReturnRefundPolicyPage = () => {
     <>
       <SEO
         title="Return & Refund Policy | Yuva Computers"
-        description="Read Yuva Computers' return and refund policy for certified refurbished laptops and Apple devices. 7-day return window for online orders, inspection process, and refund timelines."
+        description="Read Yuva Computers' return and refund policy for certified refurbished laptops and Apple devices. 15-day replacement window for online orders, inspection process, and refund timelines."
         canonical="/returns-refund-policy"
         jsonLd={policySchema}
       />

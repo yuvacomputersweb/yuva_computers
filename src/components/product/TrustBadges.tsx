@@ -7,7 +7,7 @@ export default function TrustBadges({ product }: { product: any }) {
   const items = [
     { icon: BadgeCheck, text: product.refurbishment_summary || "50-point quality check" },
     { icon: ShieldCheck, text: product.warranty_period || "Warranty included" },
-    { icon: RotateCcw, text: product.return_policy || "7-day returns on online orders" },
+    { icon: RotateCcw, text: product.return_policy || "15-day replacement" },
     { icon: Wrench, text: product.service_centers || "Service at every Yuva store" },
   ];
 

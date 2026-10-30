@@ -184,7 +184,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
       {
         question: "Can I return the laptop if I change my mind?",
         answer:
-          "Online orders carry a 7-day return window from the date of delivery for defective, damaged, or incorrect items. Returns purely for change of mind are not accepted, as each refurbished unit is individually sourced and configured.",
+          "Online orders carry a 15-day replacement window from the date of delivery for any damage or problem, or if the wrong item arrives. Returns purely for change of mind are not accepted, as each refurbished unit is individually sourced and configured.",
       },
       {
         question: "What if the laptop is faulty on arrival?",

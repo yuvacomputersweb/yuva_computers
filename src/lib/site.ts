@@ -56,8 +56,8 @@ export const TRUST_POINTS: TrustPoint[] = [
   },
   {
     icon: RotateCcw,
-    title: "7-day easy returns",
-    text: "Defective, damaged or wrong item on an online order? Send it back.",
+    title: "15-day replacement",
+    text: "Any damage or problem within 15 days of delivery? We replace it.",
   },
   {
     icon: Store,
