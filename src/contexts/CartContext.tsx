@@ -16,6 +16,8 @@ interface CartItem {
   image: string;
   quantity: number;
   stock: number;
+  /** Windows laptops share one count per model across RAM/SSD options. */
+  sharedStock?: boolean;
   variant?: string;       // Display label: "i5 / 8GB / 256GB SSD"
   variantId?: number;
   productId: number;
@@ -117,7 +119,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     setItems((prev) => {
       const existing = prev.find((item) => item.id === id);
-      const currentQty = existing ? existing.quantity : 0;
+      const shared = product.stock_mode === "model";
+      // Shared model stock: count every configuration of this model already in the cart.
+      const currentQty = shared
+        ? prev.filter((item) => item.productId === product.id).reduce((n, item) => n + item.quantity, 0)
+        : existing ? existing.quantity : 0;
 
       if (currentQty + quantity <= stock) {
         success = true;
@@ -140,6 +146,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             image,
             quantity,
             stock,
+            sharedStock: shared,
             variant: variantLabel,
             variantId: variant?.id ?? null,
             processor: variant?.processor ?? undefined,
@@ -159,7 +166,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setItems((prev) => {
       const item = prev.find((i) => i.id === id);
       if (!item) return prev;
-      if (quantity > item.stock) return prev;
+      const others = item.sharedStock
+        ? prev.filter((i) => i.productId === item.productId && i.id !== id).reduce((n, i) => n + i.quantity, 0)
+        : 0;
+      if (quantity + others > item.stock) return prev;
       if (quantity <= 0) return prev.filter((i) => i.id !== id);
       return prev.map((i) => (i.id === id ? { ...i, quantity } : i));
     });
