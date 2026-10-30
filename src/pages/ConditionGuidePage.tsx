@@ -66,7 +66,7 @@ const ConditionGuidePage = () => (
     <PageHero
       eyebrow="Condition guide"
       title="What our grades mean"
-      text="The grade only describes how the laptop looks. Every grade passes the same 50-point check and gets the same 15-day replacement."
+      text="The grade only describes how the laptop looks. Every grade passes the same 50-point check and gets the same 15-day testing warranty."
       crumbs={[{ label: "Condition guide" }]}
     />
 

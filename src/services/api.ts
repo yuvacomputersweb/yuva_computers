@@ -179,6 +179,7 @@ export const storeService = {
   getHomeData: async () => (await api.get('/store/home-data/')).data,
 
   getSiteConfig: async () => (await api.get('/store/config/')).data,
+  getWarrantyPlans: () => cachedGet('/store/warranty-plans/'),
 
   validateCoupon: async (code: string, orderTotal: number) =>
     (await api.post('/store/validate-coupon/', { code, order_total: orderTotal })).data,

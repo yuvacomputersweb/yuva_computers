@@ -51,13 +51,13 @@ export const TRUST_POINTS: TrustPoint[] = [
   },
   {
     icon: ShieldCheck,
-    title: "1-year RAM & storage cover",
-    text: "Free RAM and hard-disk replacement for a year after purchase.",
+    title: "Up to 1-year warranty",
+    text: "1-year RAM, SSD and motherboard warranty on laptops from ₹15,000.",
   },
   {
     icon: RotateCcw,
-    title: "15-day replacement",
-    text: "Any damage or problem within 15 days of delivery? We replace it.",
+    title: "15-day testing warranty",
+    text: "A functional problem in the first 15 days? We repair or replace it.",
   },
   {
     icon: Store,

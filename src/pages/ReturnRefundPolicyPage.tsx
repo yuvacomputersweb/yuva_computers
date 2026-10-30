@@ -12,7 +12,7 @@ const POLICY_SECTIONS = [
   {
     title: "2. Return Window",
     body: [
-      "Online and remote orders: If the device arrives damaged or develops any problem, you may raise a replacement request within 15 calendar days from the date of delivery.",
+      "Online and remote orders: If the device develops a functional problem, you may raise a replacement request within the 15-day testing period. Damage in transit is covered separately under Section 5 and needs an unboxing video.",
       "In-store purchases: As stated on the invoice, goods sold in store are not returnable. In-store purchases are protected instead by the 15-day testing warranty, which entitles you to repair or replacement of a defective unit — not a refund.",
     ],
   },
@@ -121,8 +121,8 @@ const POLICY_SECTIONS = [
     title: "13. Relationship to Warranty",
     body: [
       "This return policy and our warranty are separate protections.",
-      "The replacement window (15 days, online orders) covers damaged, defective, or incorrect deliveries.",
-      "The warranty continues after the return window and covers RAM and hard disk free replacement for 1 year, motherboard repair for 1 year, and free service for the life of your ownership. Apple laptops from Yuva iStore carry 6 months free service warranty.",
+      "The 15-day testing period covers defective or incorrect deliveries; transit damage is covered with an unboxing video (Section 5).",
+      "After that, cover depends on the product: laptops from ₹15,000 get 1-year RAM and hard disk replacement and 1-year motherboard repair; Apple devices and laptops with dedicated graphics get 6 months of free service; monitors are sold without warranty. See our Warranty Policy page for full details.",
     ],
   },
 ];
@@ -150,7 +150,7 @@ const ReturnRefundPolicyPage = () => {
     <>
       <SEO
         title="Return & Refund Policy | Yuva Computers"
-        description="Read Yuva Computers' return and refund policy for certified refurbished laptops and Apple devices. 15-day replacement window for online orders, inspection process, and refund timelines."
+        description="Read Yuva Computers' return and refund policy for certified refurbished laptops and Apple devices. 15-day testing period, transit-damage cover, inspection process and refund timelines."
         canonical="/returns-refund-policy"
         jsonLd={policySchema}
       />

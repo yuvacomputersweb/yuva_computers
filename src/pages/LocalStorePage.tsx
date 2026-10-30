@@ -64,7 +64,7 @@ const LocalStorePage = () => {
     },
     {
       q: "Do refurbished laptops from Yuva come with warranty?",
-      a: "Every laptop goes through a 50-point check, comes with a written warranty and a 15-day replacement for any damage or problem.",
+      a: "Every laptop goes through a 50-point check and comes with a 15-day testing warranty. Laptops from ₹15,000 also get a 1-year RAM, SSD and motherboard warranty.",
     },
     {
       q: `Can I exchange my old laptop at the ${area} store?`,
@@ -95,14 +95,14 @@ const LocalStorePage = () => {
     <>
       <SEO
         title={`Refurbished ${isIStore ? "MacBooks" : "Laptops"} in ${place} | Yuva Computers`}
-        description={`Buy certified refurbished ${what} in ${place} with warranty and 15-day replacement. Visit Yuva Computers ${area}, test before you buy, or exchange your old laptop.`}
+        description={`Buy certified refurbished ${what} in ${place} with warranty and a 15-day testing warranty. Visit Yuva Computers ${area}, test before you buy, or exchange your old laptop.`}
         canonical={canonical}
         jsonLd={schema}
       />
       <PageHero
         eyebrow={`Yuva Computers · ${store.state}`}
         title={<>Refurbished {what} in <span className="text-brand-leaf">{place}</span></>}
-        text={`Test the exact ${isIStore ? "MacBook" : "laptop"} before you buy, take it home the same day, and get our warranty and 15-day replacement.`}
+        text={`Test the exact ${isIStore ? "MacBook" : "laptop"} before you buy, take it home the same day, and get our warranty and 15-day testing warranty.`}
         crumbs={[{ label: "Stores", to: "/stores" }, { label: area }]}
       />
 
@@ -136,7 +136,7 @@ const LocalStorePage = () => {
           <ul className="grid sm:grid-cols-2 gap-3 pt-5 border-t border-border text-sm">
             <li className="flex gap-2"><BadgeCheck className="w-5 h-5 text-brand-leaf-dark shrink-0" /> 50-point quality check</li>
             <li className="flex gap-2"><ShieldCheck className="w-5 h-5 text-brand-leaf-dark shrink-0" /> Written warranty</li>
-            <li className="flex gap-2"><RefreshCw className="w-5 h-5 text-brand-leaf-dark shrink-0" /> 15-day replacement</li>
+            <li className="flex gap-2"><RefreshCw className="w-5 h-5 text-brand-leaf-dark shrink-0" /> 15-day testing warranty</li>
             <li className="flex gap-2"><Wrench className="w-5 h-5 text-brand-leaf-dark shrink-0" /> RAM & SSD upgrades</li>
           </ul>
         </div>
