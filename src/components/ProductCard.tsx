@@ -1,122 +1,134 @@
 //productcard
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Target, Star } from "lucide-react";
-import { type ApiProduct, getVariantSummary, getCardPrice } from "@/types/product";
+import { Star, Laptop, BadgeCheck, ArrowRight } from "lucide-react";
+import { type ApiProduct, getCardPrice, getSpecBadges } from "@/types/product";
 
-const conditionColors: Record<string, string> = {
-  like_new: "bg-primary text-primary-foreground",
-  excellent: "bg-success text-success-foreground",
-  good: "bg-secondary text-secondary-foreground",
-  value: "bg-muted text-muted-foreground",
+const conditionStyles: Record<string, string> = {
+  like_new: "bg-brand-leaf text-white",
+  excellent: "bg-primary text-primary-foreground",
+  good: "bg-brand-sky text-white",
+  value: "bg-brand-navy text-white",
+};
+
+/** Product image with a neutral laptop fallback when the file is missing. */
+export const ProductImage = ({ src, alt, className = "" }: { src?: string; alt: string; className?: string }) => {
+  const [failed, setFailed] = useState(!src);
+  if (failed) {
+    return (
+      <div className={`grid place-items-center text-muted-foreground/40 ${className}`} aria-label={alt} role="img">
+        <Laptop className="w-1/3 h-1/3" strokeWidth={1.25} />
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className={`object-contain ${className}`}
+    />
+  );
 };
 
 const ProductCard = ({ product }: { product: ApiProduct }) => {
-  const primaryImage = product.images?.[0]?.image || "/placeholder.png";
+  const primaryImage = product.images?.find((i) => i.is_primary)?.image || product.images?.[0]?.image;
 
   // ── Price: cheapest in-stock variant ────────────────────────────────────
   const { price, originalPrice } = getCardPrice(product);
+  const hasDiscount = !!originalPrice && originalPrice > price;
+  const discount = product.discount_percentage
+    || (hasDiscount ? Math.round(((originalPrice! - price) / originalPrice!) * 100) : 0);
 
-  // ── Variant combination summary pills ───────────────────────────────────
-  // e.g. ["Core i7 | 16GB | 512GB", "Core i5 | 8GB | 256GB", "+2 more"]
-  // Derived purely from product.variants[] — no product-level specs used.
-  const variantSummary = getVariantSummary(product);
+  // ── Spec chips for the cheapest variant (processor / RAM / storage) ─────
+  // Variants are the single source of truth; products without variants
+  // fall back to their display size only.
+  const specs = getSpecBadges(product);
+  const variantCount = product.variants?.length ?? 0;
+  const chips = specs.length > 0 ? specs : [product.display].filter(Boolean) as string[];
 
   return (
-    <div className="group bg-card rounded-xl overflow-hidden shadow-ambient hover:shadow-lg transition-all duration-300 flex flex-col h-full">
-      <Link to={`/product/${product.slug}`} className="block">
-        <div className="relative bg-surface-low flex items-center justify-center aspect-square overflow-hidden p-4">
+    <div className="group relative bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 flex flex-col h-full overflow-hidden">
+      <Link to={`/product/${product.slug}`} className="block" aria-label={product.title}>
+        <div className="relative bg-gradient-to-b from-muted/80 to-muted/30 aspect-[4/3] overflow-hidden">
           <span
-            className={`absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md text-[10px] font-display font-bold uppercase tracking-wider ${
-              conditionColors[product.condition] || "bg-muted"
+            className={`absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+              conditionStyles[product.condition] || "bg-muted text-foreground"
             }`}
           >
             {product.condition_display || product.condition}
           </span>
-          <img
+          {discount > 0 && (
+            <span className="absolute top-3 right-3 z-10 px-2 py-1 rounded-full text-[10px] font-bold bg-white text-brand-leaf-dark shadow-sm">
+              {discount}% OFF
+            </span>
+          )}
+          <ProductImage
             src={primaryImage}
             alt={product.title}
-            loading="lazy"
-            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full p-6 group-hover:scale-105 transition-transform duration-500"
           />
         </div>
       </Link>
 
       <div className="p-4 flex flex-col flex-1">
-        {product.usage_tags && product.usage_tags.length > 0 && (
-          <div className="flex items-center gap-1 text-[10px] font-bold text-primary mb-2 uppercase tracking-wider">
-            <Target className="w-3 h-3" />
-            {product.usage_tags[0].name}
-          </div>
-        )}
-
-        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">
-          {product.brand_name}
-        </p>
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider truncate">
+            {product.brand_name}
+            {product.usage_tags?.[0] && <span className="text-primary"> · {product.usage_tags[0].name}</span>}
+          </p>
+          {(product.review_count ?? 0) > 0 && (
+            <span className="flex items-center gap-0.5 text-xs font-semibold shrink-0">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              {product.average_rating}
+              <span className="text-muted-foreground font-normal">({product.review_count})</span>
+            </span>
+          )}
+        </div>
 
         <Link to={`/product/${product.slug}`}>
-          <h3 className="font-display font-bold text-foreground text-sm leading-tight line-clamp-2 hover:text-primary transition-colors">
+          <h3 className="font-display font-bold text-foreground text-[15px] leading-snug line-clamp-2 min-h-[2.6em] hover:text-primary transition-colors">
             {product.title}
           </h3>
         </Link>
 
-        {/* Reviews */}
-        {(product.review_count ?? 0) > 0 && (
-          <div className="flex items-center gap-1 mt-1 mb-2">
-            <div className="flex text-yellow-400">
-              <Star className="w-3 h-3 fill-current" />
-            </div>
-            <span className="text-xs font-bold">{product.average_rating}</span>
-            <span className="text-[10px] text-muted-foreground">({product.review_count})</span>
-          </div>
-        )}
-
-        {/*
-          Variant combination summary.
-          Each pill shows one full combination: "processor | ram | storage".
-          The last pill may be "+N more" when variants exceed MAX_SHOWN.
-          Only rendered when the product has variants — no product-level specs.
-        */}
-        {variantSummary.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {variantSummary.map((label) => (
-              <span
-                key={label}
-                className={`text-[10px] px-2 py-0.5 rounded font-medium ${
-                  label.startsWith("+")
-                    ? "bg-primary/10 text-primary"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
+        {chips.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {chips.map((label) => (
+              <span key={label} className="text-[11px] px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-medium">
                 {label}
               </span>
             ))}
+            {variantCount > 1 && (
+              <span className="text-[11px] px-2 py-0.5 rounded-md bg-primary/10 text-primary font-semibold">
+                {variantCount} configs
+              </span>
+            )}
           </div>
         )}
 
-        <div className="mt-auto pt-4 flex items-end justify-between gap-2">
-          <div>
-            <p className="font-display font-extrabold text-lg text-foreground">
+        <div className="mt-auto pt-4">
+          <p className="text-[11px] text-muted-foreground">{variantCount > 1 ? "Starting from" : "Price"}</p>
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="font-display font-extrabold text-xl text-foreground">
               ₹{price.toLocaleString("en-IN")}
-            </p>
-            <div className="flex items-center gap-2">
-              {originalPrice && originalPrice > price && (
-                <p className="text-xs text-muted-foreground line-through">
-                  ₹{originalPrice.toLocaleString("en-IN")}
-                </p>
-              )}
-              {product.discount_percentage && product.discount_percentage > 0 && (
-                <span className="text-[10px] font-bold text-success">
-                  {product.discount_percentage}% OFF
-                </span>
-              )}
-            </div>
+            </span>
+            {hasDiscount && (
+              <span className="text-xs text-muted-foreground line-through">
+                ₹{originalPrice!.toLocaleString("en-IN")}
+              </span>
+            )}
           </div>
+          <p className="flex items-center gap-1 mt-1 text-[11px] font-medium text-brand-leaf-dark">
+            <BadgeCheck className="w-3.5 h-3.5" /> 50-point quality checked
+          </p>
 
           <Link
             to={`/product/${product.slug}`}
-            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity"
+            className="mt-3 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-brand-navy text-white text-sm font-semibold group-hover:bg-primary transition-colors"
           >
-            View Details
+            View details <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

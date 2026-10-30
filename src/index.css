@@ -15,11 +15,18 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 40% 10%;
 
-    --primary: 216 62% 39%;
+    --primary: 214 78% 34%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 199 66% 53%;
+    --secondary: 200 69% 53%;
     --secondary-foreground: 0 0% 100%;
+
+    /* Brand palette, taken from the logo */
+    --brand-navy: 220 60% 11%;
+    --brand-navy-soft: 218 45% 18%;
+    --brand-sky: 200 69% 53%;
+    --brand-leaf: 92 51% 49%;
+    --brand-leaf-dark: 95 55% 32%;
 
     --muted: 220 20% 96%;
     --muted-foreground: 220 10% 40%;
@@ -38,9 +45,9 @@
 
     --border: 220 13% 91%;
     --input: 220 20% 96%;
-    --ring: 216 62% 39%;
+    --ring: 214 78% 34%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
     --surface: 220 20% 98%;
     --surface-low: 220 25% 96%;
@@ -104,7 +111,29 @@
 
 @layer utilities {
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(216 62% 39%), hsl(199 66% 53%));
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--brand-sky)));
+  }
+  .bg-hero {
+    background:
+      radial-gradient(60% 80% at 85% 10%, hsl(var(--brand-sky) / 0.28), transparent 60%),
+      radial-gradient(50% 60% at 10% 100%, hsl(var(--brand-leaf) / 0.16), transparent 60%),
+      hsl(var(--brand-navy));
+  }
+  .bg-grid-faint {
+    background-image:
+      linear-gradient(hsl(0 0% 100% / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(0 0% 100% / 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee { animation: none; }
   }
   .glass-nav {
     background: hsl(var(--surface) / 0.7);

@@ -28,10 +28,10 @@ export const PartnersSection = () => {
   }, []);
 
   return (
-    <section className="py-16 lg:py-20 border-y border-border/30 overflow-hidden bg-surface">
+    <section className="py-10 md:py-14 border-t border-border overflow-hidden">
       <div className="container mx-auto px-6 text-center mb-8">
         <p className="text-xs font-display font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Trusted by Industry Leaders
+          Brands we sell & service
         </p>
       </div>
       <div className="relative flex overflow-hidden whitespace-nowrap w-full group">
@@ -45,8 +45,7 @@ export const PartnersSection = () => {
           {[...partners, ...partners].map((p, i) => (
             <span
               key={i}
-              className="font-display font-extrabold text-2xl tracking-widest opacity-80 hover:opacity-100 transition-opacity"
-              style={{ color: p.color }}
+              className="font-display font-extrabold text-2xl tracking-widest text-muted-foreground/50 hover:text-foreground transition-colors"
             >
               {p.name}
             </span>

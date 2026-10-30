@@ -22,24 +22,18 @@ export const BlogsSection = () => {
   if (!blogs.length) return null;
 
   return (
-    <section className="py-16 bg-background">
-      <div className="container mx-auto px-6">
+    <section className="py-14 md:py-20">
+      <div className="container mx-auto px-4 md:px-6">
         {/* Header */}
         <div className="flex items-end justify-between mb-10">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-2">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-leaf-dark mb-3">
               From Our Desk
             </p>
-            <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight">
-              Latest Blogs
+            <h2 className="font-display font-extrabold text-2xl md:text-4xl text-foreground tracking-tight">
+              Guides & tips
             </h2>
           </div>
-          <Link
-            to="/blogs"
-            className="hidden md:flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-          >
-            View all <ArrowRight size={14} />
-          </Link>
         </div>
 
         {/* Grid */}
@@ -88,15 +82,6 @@ export const BlogsSection = () => {
           ))}
         </div>
 
-        {/* Mobile "View all" */}
-        <div className="mt-8 flex justify-center md:hidden">
-          <Link
-            to="/blogs"
-            className="flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-          >
-            View all blogs <ArrowRight size={14} />
-          </Link>
-        </div>
       </div>
     </section>
   );
