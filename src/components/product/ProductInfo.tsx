@@ -223,9 +223,11 @@ export default function ProductInfo({
   );
 
   // Windows laptops can be upgraded before delivery (per the store's FAQ).
+  // Only offered when the listing itself has no upgraded configurations to pick.
   const isUpgradeable =
-    ["laptops", "graphic card laptops"].includes(String(product.category_name).toLowerCase()) &&
-    product.brand_name?.toLowerCase() !== "apple";
+    /laptop/i.test(String(product.category_name)) &&
+    product.brand_name?.toLowerCase() !== "apple" &&
+    new Set(variants.map((v) => `${v.ram}|${v.storage}`)).size < 2;
 
   const keySpecs = [
     { icon: Cpu, label: "Processor", value: activeVariant?.processor || product.processor },
@@ -256,7 +258,9 @@ export default function ProductInfo({
             {product.brand_name} · {product.category_name}
           </span>
         </div>
-        <h1 className="font-display text-2xl md:text-4xl font-extrabold text-foreground tracking-tight leading-tight">
+        <h1 className={`font-display font-extrabold text-foreground tracking-tight leading-tight ${
+          String(product.title).length > 60 ? "text-xl md:text-[1.75rem]" : "text-2xl md:text-4xl"
+        }`}>
           {product.title}
         </h1>
         <div className="flex gap-2 mt-3">

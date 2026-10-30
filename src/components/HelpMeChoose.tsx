@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { X, GraduationCap, Briefcase, Code2, Palette, Building2, ArrowLeft, MessageCircle } from "lucide-react";
 import { BUDGET_RANGES, budgetHref, whatsappLink } from "@/lib/site";
 
+// Slugs are the store's own usage tags (Admin → Store → Usage tags).
 const USES = [
-  { slug: "students", label: "Studies & online classes", icon: GraduationCap },
+  { slug: "learning", label: "Studies & online classes", icon: GraduationCap },
   { slug: "office", label: "Office work & browsing", icon: Briefcase },
-  { slug: "coding", label: "Coding & multitasking", icon: Code2 },
-  { slug: "videographics", label: "Design, video & CAD", icon: Palette },
-  { slug: "business", label: "Business & travel", icon: Building2 },
+  { slug: "development", label: "Coding & development", icon: Code2 },
+  { slug: "designing", label: "Design, video & CAD", icon: Palette },
+  { slug: "tallyms-office", label: "Tally, billing & accounts", icon: Building2 },
 ];
 
 const HelpMeChoose = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
