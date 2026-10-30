@@ -24,6 +24,10 @@ import BlogsPage from "@/pages/BlogsPage";
 import ComparePage from "@/pages/ComparePage";
 import WishlistPage from "@/pages/WishlistPage";
 import TrackOrderPage from "@/pages/TrackOrderPage";
+import SellLaptopPage from "@/pages/SellLaptopPage";
+import WarrantyPage from "@/pages/WarrantyPage";
+import ConditionGuidePage from "@/pages/ConditionGuidePage";
+import LocalStorePage from "@/pages/LocalStorePage";
 import FaqPage from "@/pages/FaqPage";
 import ReturnRefundPolicyPage from "@/pages/ReturnRefundPolicyPage";
 import ShippingPolicyPage from "@/pages/ShippingPolicyPage";
@@ -59,6 +63,10 @@ const App = () => (
                 <Route path="/compare" element={<ComparePage />} />
                 <Route path="/wishlist" element={<WishlistPage />} />
                 <Route path="/track-order" element={<TrackOrderPage />} />
+                <Route path="/sell-your-laptop" element={<SellLaptopPage />} />
+                <Route path="/warranty" element={<WarrantyPage />} />
+                <Route path="/condition-guide" element={<ConditionGuidePage />} />
+                <Route path="/refurbished-laptops-in/:city" element={<LocalStorePage />} />
                 <Route path="/blogs/:slug" element={<BlogDetailPage />} />
                 <Route path="/faq" element={<FaqPage />} />
                 <Route path="/returns-refund-policy" element={<ReturnRefundPolicyPage />} />

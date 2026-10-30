@@ -51,7 +51,8 @@ api.interceptors.response.use(
       const isAuthRequest =
         error.config.url.includes('/auth/login') ||
         error.config.url.includes('/auth/google') ||
-        error.config.url.includes('/auth/signup');
+        error.config.url.includes('/auth/signup') ||
+        error.config.url.includes('/engage/cart');
 
       if (!isAuthRequest) {
         localStorage.removeItem('yuvaToken');
@@ -274,6 +275,41 @@ export const contactService = {
     order_id?: string;
     complaint: string;
   }) => (await api.post('/contact/complaint/', data)).data,
+};
+
+export interface PincodeResult {
+  pin: string;
+  serviceable: boolean;
+  verified: boolean;
+  cod: boolean | null;
+  city: string;
+  min_days: number;
+  max_days: number;
+}
+
+export interface Offer {
+  code: string;
+  description: string;
+  discount_type: 'percentage' | 'fixed';
+  value: number;
+  min_order_value: number;
+  first_order_only: boolean;
+}
+
+/** Stock alerts, delivery estimates, trade-in, warranty, reviews, offers. */
+export const engageService = {
+  checkPincode: async (pin: string): Promise<PincodeResult> =>
+    (await api.get('/engage/pincode/', { params: { pin } })).data,
+  createStockAlert: async (data: { product: number; variant?: number; phone: string; name?: string }) =>
+    (await api.post('/engage/stock-alerts/', data)).data,
+  saveCart: async (items: { product_id: number; variant_id?: number; title: string; quantity: number; price: number }[]) =>
+    (await api.put('/engage/cart/', { items })).data,
+  submitTradeIn: async (form: FormData) =>
+    (await api.post('/engage/trade-in/', form, { headers: { 'Content-Type': 'multipart/form-data' } })).data,
+  lookupWarranty: async (params: { serial?: string; order_id?: string; phone?: string }) =>
+    (await api.get('/engage/warranty/', { params })).data,
+  getGoogleReviews: () => cachedGet('/engage/google-reviews/'),
+  getOffers: (): Promise<Offer[]> => cachedGet('/engage/offers/'),
 };
 
 export default api;

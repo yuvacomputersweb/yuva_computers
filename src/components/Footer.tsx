@@ -114,6 +114,7 @@ const Footer = () => {
             <li><Link to="/company" className={linkClass}>About us</Link></li>
             <li><Link to="/stores" className={linkClass}>Store locations</Link></li>
             <li><Link to="/bulk-orders" className={linkClass}>Bulk orders</Link></li>
+            <li><Link to="/sell-your-laptop" className={linkClass}>Sell / exchange your laptop</Link></li>
             <li><Link to="/contact" className={linkClass}>Contact us</Link></li>
           </FooterColumn>
 
@@ -124,6 +125,8 @@ const Footer = () => {
             <li><Link to="/returns-refund-policy" className={linkClass}>Return & refund policy</Link></li>
             <li><Link to="/shipping-policy" className={linkClass}>Shipping policy</Link></li>
             <li><Link to="/track-order" className={linkClass}>Track my order</Link></li>
+            <li><Link to="/warranty" className={linkClass}>Check warranty</Link></li>
+            <li><Link to="/condition-guide" className={linkClass}>Condition grades</Link></li>
           </FooterColumn>
         </div>
 

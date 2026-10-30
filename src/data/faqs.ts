@@ -132,11 +132,6 @@ export const FAQ_SECTIONS: FaqSection[] = [
           "COD availability depends on the pin code and the order value. Please confirm with our sales team before placing the order.",
       },
       {
-        question: "Do you provide a GST invoice?",
-        answer:
-          "Yes. Share your GSTIN and registered business name before we generate the invoice. GST invoices cannot be amended after issue.",
-      },
-      {
         question: "Do you handle bulk and corporate orders?",
         answer:
           "Yes — this is a major part of our business. We supply refurbished laptops in volume to startups, training institutes, BPOs, and enterprises, and we also offer corporate laptop rental. For bulk enquiries call 9030539456.",

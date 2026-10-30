@@ -29,6 +29,7 @@ interface SearchResult {
 const navLinks = [
   { label: "Home", path: "/" },
   { label: "Shop", path: "/products", hasMega: true },
+  { label: "Sell / Exchange", path: "/sell-your-laptop" },
   { label: "Bulk Orders", path: "/bulk-orders" },
   { label: "Stores", path: "/stores" },
   { label: "Company", path: "/company" },

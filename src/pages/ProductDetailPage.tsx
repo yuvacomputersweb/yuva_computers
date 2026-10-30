@@ -10,6 +10,7 @@ import ProductTabs from "@/components/product/ProductTabs";
 import ProductCarousel from "@/components/ProductCarousel";
 import ReviewSection from "@/components/product/ReviewsSection";
 import TrustBadges from "@/components/product/TrustBadges";
+import ProductVideo from "@/components/product/ProductVideo";
 import {
   Accordion,
   AccordionContent,
@@ -117,7 +118,33 @@ export default function ProductDetailPage() {
         "availability": product.in_stock
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
+        "seller": { "@type": "Organization", "name": "Yuva Computers" },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "IN" },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": { "@type": "QuantitativeValue", "minValue": 0, "maxValue": 1, "unitCode": "DAY" },
+            "transitTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 7, "unitCode": "DAY" },
+          },
+        },
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "IN",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": 15,
+        },
       },
+      ...(product.sku ? { "sku": product.sku } : {}),
+      ...(product.review_count > 0
+        ? {
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": product.average_rating,
+              "reviewCount": product.review_count,
+            },
+          }
+        : {}),
     },
     {
       "@context": "https://schema.org",
@@ -168,6 +195,7 @@ export default function ProductDetailPage() {
           <div className="grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-14 items-start">
             <div className="lg:sticky lg:top-40">
               <ImageGallery product={product} />
+              <ProductVideo product={product} />
             </div>
             <div className="space-y-6">
               <ProductInfo product={product} onVariantChange={setActiveVariant} />

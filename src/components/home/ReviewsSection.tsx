@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
+import { engageService } from "@/services/api";
 import { SITE } from "@/lib/site";
 
 interface Review {
@@ -7,6 +9,16 @@ interface Review {
   rating: number;
   text: string;
   googleUrl?: string;
+  photo?: string;
+  when?: string;
+}
+
+interface LiveReviews {
+  available: boolean;
+  rating?: number;
+  total?: number;
+  url?: string;
+  reviews?: { author: string; photo: string; rating: number; text: string; when: string }[];
 }
 
 const DEFAULT_REVIEWS: Review[] = [
@@ -40,7 +52,20 @@ const GoogleLogo = ({ className = "w-5 h-5" }: { className?: string }) => (
 );
 
 export const ReviewsSection = () => {
-  const data = DEFAULT_REVIEWS;
+  // Live reviews from the Google Business profile when the API key is set up.
+  const [live, setLive] = useState<LiveReviews | null>(null);
+  useEffect(() => {
+    engageService.getGoogleReviews().then(setLive).catch(() => setLive(null));
+  }, []);
+
+  const liveReviews: Review[] =
+    live?.available && live.reviews?.length
+      ? live.reviews.map((r, i) => ({ id: i, name: r.author, rating: r.rating, text: r.text, photo: r.photo, when: r.when, googleUrl: live.url }))
+      : [];
+  const data = liveReviews.length >= 3 ? liveReviews : DEFAULT_REVIEWS;
+  const rating = live?.available && live.rating ? live.rating.toFixed(1) : SITE.googleRating;
+  const ratingNum = Number(rating);
+  const reviewsUrl = (live?.available && live.url) || SITE.googleReviewsUrl;
 
   return (
     <section className="py-14 md:py-20">
@@ -57,16 +82,18 @@ export const ReviewsSection = () => {
               <div className="flex items-center gap-2 text-white/70 text-sm font-medium">
                 <GoogleLogo className="w-5 h-5" /> Google rating
               </div>
-              <p className="mt-4 font-display font-extrabold text-6xl">{SITE.googleRating}</p>
+              <p className="mt-4 font-display font-extrabold text-6xl">{rating}</p>
               <div className="flex mt-2">
                 {[0, 1, 2, 3, 4].map((i) => (
-                  <Star key={i} className={`w-5 h-5 ${i < 4 ? "fill-amber-400 text-amber-400" : "fill-amber-400/40 text-amber-400/40"}`} />
+                  <Star key={i} className={`w-5 h-5 ${i < Math.round(ratingNum) ? "fill-amber-400 text-amber-400" : "fill-amber-400/40 text-amber-400/40"}`} />
                 ))}
               </div>
-              <p className="mt-3 text-sm text-white/60">From verified Google reviews across our stores.</p>
+              <p className="mt-3 text-sm text-white/60">
+                {live?.available && live.total ? `From ${live.total.toLocaleString("en-IN")} Google reviews.` : "From verified Google reviews across our stores."}
+              </p>
             </div>
             <a
-              href={SITE.googleReviewsUrl}
+              href={reviewsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center h-11 rounded-full bg-white text-brand-navy text-sm font-semibold hover:bg-white/90"
@@ -80,7 +107,7 @@ export const ReviewsSection = () => {
             {data.slice(0, 3).map((r) => (
               <a
                 key={r.id}
-                href={r.googleUrl || SITE.googleReviewsUrl}
+                href={r.googleUrl || reviewsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="snap-start shrink-0 w-[85%] md:w-auto flex flex-col rounded-2xl border border-border bg-card p-6 hover:shadow-lg hover:border-primary/30 transition-all"
@@ -95,12 +122,16 @@ export const ReviewsSection = () => {
                 </div>
                 <p className="text-sm text-foreground/80 leading-relaxed line-clamp-6">“{r.text}”</p>
                 <div className="mt-auto pt-5 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-primary/10 grid place-items-center text-primary text-sm font-bold">
-                    {r.name[0]}
-                  </div>
+                  {r.photo ? (
+                    <img src={r.photo} alt="" referrerPolicy="no-referrer" className="w-9 h-9 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-primary/10 grid place-items-center text-primary text-sm font-bold">
+                      {r.name[0]}
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm font-bold">{r.name}</p>
-                    <p className="text-[11px] text-muted-foreground">Google review</p>
+                    <p className="text-[11px] text-muted-foreground">Google review{r.when ? ` · ${r.when}` : ""}</p>
                   </div>
                 </div>
               </a>

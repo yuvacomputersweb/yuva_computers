@@ -1,12 +1,14 @@
 //product info component
 import { useState, useMemo, useEffect, useRef } from "react";
-import { ShoppingCart, Zap, Star, Minus, Plus, MessageCircle, Truck, Store, Cpu, MemoryStick, HardDrive, Monitor, Heart, Scale } from "lucide-react";
+import { ShoppingCart, Zap, Star, Minus, Plus, MessageCircle, Store, Cpu, MemoryStick, HardDrive, Monitor, Heart, Scale } from "lucide-react";
 import { useShopLists } from "@/contexts/ShopListsContext";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { whatsappLink } from "@/lib/site";
 import { isPlaceholderSpec } from "@/lib/specs";
+import { Link } from "react-router-dom";
+import { EmiLine, OffersList, InTheBox, DeliveryEstimate, NotifyMe } from "./ProductExtras";
 
 const conditionStyles: Record<string, string> = {
   like_new: "bg-brand-leaf/15 text-brand-leaf-dark",
@@ -229,6 +231,8 @@ export default function ProductInfo({
     product.brand_name?.toLowerCase() !== "apple" &&
     new Set(variants.map((v) => `${v.ram}|${v.storage}`)).size < 2;
 
+  const isLaptop = /laptop|macbook|notebook|workstation|chromebook/i.test(`${product.category_name} ${product.title}`);
+
   const keySpecs = [
     { icon: Cpu, label: "Processor", value: activeVariant?.processor || product.processor },
     { icon: MemoryStick, label: "RAM", value: activeVariant?.ram || product.ram },
@@ -251,9 +255,13 @@ export default function ProductInfo({
       {/* Title + Rating */}
       <div>
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${conditionStyles[product.condition] || "bg-muted"}`}>
-            {product.condition_display || product.condition}
-          </span>
+          <Link
+            to={`/condition-guide#${product.condition}`}
+            title="What does this condition mean?"
+            className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider hover:underline ${conditionStyles[product.condition] || "bg-muted"}`}
+          >
+            {product.condition_display || product.condition} ⓘ
+          </Link>
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {product.brand_name} · {product.category_name}
           </span>
@@ -342,8 +350,11 @@ export default function ProductInfo({
             You save ₹{savings.toLocaleString("en-IN")} vs. the original price
           </p>
         )}
-        <p className="mt-1 text-xs text-muted-foreground">GST invoice available on request</p>
+        <EmiLine price={displayPrice} />
       </div>
+
+
+      <OffersList price={displayPrice} />
 
 
       {/* Variant selectors — only show if variants exist */}
@@ -407,6 +418,16 @@ export default function ProductInfo({
       </div>
 
 
+      {currentStock === 0 && (
+        <NotifyMe
+          key={activeVariant?.id ?? "product"}
+          productId={product.id}
+          variantId={activeVariant?.id}
+          label={activeVariant ? [activeVariant.processor, activeVariant.ram, activeVariant.storage].filter(Boolean).join(" / ") : undefined}
+        />
+      )}
+
+
       {/* CTA buttons */}
       <div ref={ctaRef} className="grid sm:grid-cols-2 gap-3">
         <button
@@ -437,13 +458,7 @@ export default function ProductInfo({
 
       {/* Delivery */}
       <div className="rounded-2xl bg-muted/60 divide-y divide-border">
-        <div className="flex gap-3 p-4">
-          <Truck className="w-5 h-5 text-primary shrink-0" />
-          <div className="text-sm">
-            <p className="font-semibold">Delivery across India</p>
-            <p className="text-muted-foreground">Usually 1–3 business days in Hyderabad and Telangana.</p>
-          </div>
-        </div>
+        <DeliveryEstimate />
         <div className="flex gap-3 p-4">
           <Store className="w-5 h-5 text-primary shrink-0" />
           <div className="text-sm">
@@ -452,6 +467,9 @@ export default function ProductInfo({
           </div>
         </div>
       </div>
+
+
+      {isLaptop && <InTheBox />}
 
 
       {/* Mobile sticky buy bar */}

@@ -114,7 +114,6 @@ const POLICY_SECTIONS = [
       "Dedicated freight or our own transport",
       "Staged or multi-location delivery",
       "On-site unboxing, setup, and imaging",
-      "Delivery challans and consolidated GST invoicing",
       "Contact our bulk orders team on 9030539456 to plan a deployment.",
     ],
   },
