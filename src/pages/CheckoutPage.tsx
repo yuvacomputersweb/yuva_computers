@@ -327,9 +327,10 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="container mx-auto px-6 py-24 text-center">
-        <h1 className="font-display font-bold text-2xl mb-4">Your cart is empty</h1>
-        <Link to="/products" className="text-primary hover:underline font-semibold">
-          ← Continue Shopping
+        <h1 className="font-display font-extrabold text-2xl md:text-3xl mb-2">Your cart is empty</h1>
+        <p className="text-muted-foreground mb-6">Add a laptop to your cart to check out.</p>
+        <Link to="/products" className="inline-flex items-center h-11 px-6 rounded-full bg-brand-navy text-white font-semibold">
+          Browse laptops
         </Link>
       </div>
     );
@@ -340,18 +341,26 @@ export default function CheckoutPage() {
   return (
     <>
     <SEO title="Secure Checkout | Yuva Computers" canonical="/checkout" noindex={true} />
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 md:px-6 py-4 md:py-8">
-        <h1 className="font-display font-extrabold text-2xl md:text-3xl text-foreground mb-8">
-          Checkout
-        </h1>
+    <div className="min-h-screen bg-muted/50">
+      <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-8">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-leaf-dark mb-2">Secure checkout</p>
+            <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight text-foreground">
+              Almost yours
+            </h1>
+          </div>
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <ShieldCheck className="w-4 h-4 text-brand-leaf-dark" /> Payments secured by Razorpay
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* ── LEFT ── */}
           <div className="lg:col-span-2 space-y-6">
 
             {/* Address */}
-            <div className="bg-card rounded-2xl border border-border/30 p-6">
+            <div className="bg-card rounded-2xl border border-border p-6">
               <AddressManager
                 onSelect={(addr) => setSelectedAddress(addr as unknown as Address)}
                 selectedId={
@@ -374,8 +383,8 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-card rounded-2xl border border-border/30 p-6 space-y-4">
-              <h3 className="font-display font-bold text-foreground">Payment Method</h3>
+            <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
+              <h3 className="font-display font-bold text-lg text-foreground">Payment Method</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {(["Online", "COD"] as const).map((method) => (
                   <button
@@ -383,12 +392,12 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod(method)}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       paymentMethod === method
-                        ? "border-primary bg-primary/5"
+                        ? "border-brand-navy bg-brand-navy/5"
                         : "border-border/30 hover:border-border"
                     }`}
                   >
                     <p className="font-bold text-sm text-foreground">
-                      {method === "Online" ? "💳 Online Payment" : "💵 Cash on Delivery"}
+                      {method === "Online" ? "Pay online" : "Cash on delivery"}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {method === "Online"
@@ -407,8 +416,8 @@ export default function CheckoutPage() {
 
           {/* ── RIGHT — Order Summary ── */}
           <div className="lg:col-span-1">
-            <div className="bg-card rounded-2xl border border-border/30 p-6 space-y-5 lg:sticky lg:top-28">
-              <h3 className="font-display font-bold text-foreground">Order Summary</h3>
+            <div className="bg-card rounded-2xl border border-border p-6 space-y-5 lg:sticky lg:top-40">
+              <h3 className="font-display font-bold text-lg text-foreground">Order Summary</h3>
 
               {/* Cart items */}
               <div className="space-y-3 max-h-52 overflow-y-auto pr-1">
@@ -418,7 +427,7 @@ export default function CheckoutPage() {
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-12 h-12 object-contain rounded-lg bg-muted/30 border border-border/20 p-1 shrink-0"
+                        className="w-12 h-12 object-contain rounded-lg bg-muted/30 border border-border p-1 shrink-0"
                       />
                     ) : (
                       <div className="w-12 h-12 bg-muted rounded-lg shrink-0" />
@@ -452,7 +461,7 @@ export default function CheckoutPage() {
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                     disabled={!!couponApplied}
                     placeholder="SAVE20"
-                    className="flex-1 border border-border/30 rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 font-mono uppercase"
+                    className="flex-1 border border-border rounded-xl px-3 h-10 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 font-mono uppercase"
                   />
                   <button
                     onClick={handleApplyCoupon}
@@ -460,7 +469,7 @@ export default function CheckoutPage() {
                     className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors disabled:opacity-60 ${
                       couponApplied
                         ? "bg-destructive/10 text-destructive"
-                        : "gradient-primary text-primary-foreground"
+                        : "bg-brand-navy text-white"
                     }`}
                   >
                     {couponLoading ? (
@@ -493,7 +502,7 @@ export default function CheckoutPage() {
                     onChange={(e) => setExchangeCode(e.target.value.toUpperCase())}
                     disabled={!!exchangeApplied}
                     placeholder="YC-XXXXXXXX"
-                    className="flex-1 border border-border/30 rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 font-mono uppercase"
+                    className="flex-1 border border-border rounded-xl px-3 h-10 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 font-mono uppercase"
                   />
                   <button
                     onClick={handleApplyExchangeCode}
@@ -525,7 +534,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Price Breakdown */}
-              <div className="border-t border-border/20 pt-4 space-y-2.5">
+              <div className="border-t border-border pt-4 space-y-2.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">₹{subtotal.toLocaleString("en-IN")}</span>
@@ -552,7 +561,7 @@ export default function CheckoutPage() {
                 )}
 
                 {/* Product total — always shows true product price */}
-                <div className="flex justify-between items-center pt-3 border-t border-border/20">
+                <div className="flex justify-between items-center pt-3 border-t border-border">
                   <span className="font-display font-bold text-foreground">
                     {isCOD ? "Product Total" : "Total"}
                   </span>
@@ -623,7 +632,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Return Policy */}
-              <div className="bg-muted/30 rounded-xl p-4 space-y-3 border border-border/20">
+              <div className="bg-muted/30 rounded-xl p-4 space-y-3 border border-border">
                 <p className="text-[10px] font-bold text-foreground uppercase tracking-wider">
                   Return & Exchange Policy
                 </p>
@@ -664,7 +673,7 @@ export default function CheckoutPage() {
               <button
                 onClick={handlePlaceOrder}
                 disabled={isPlacingOrder}
-                className="w-full gradient-primary text-primary-foreground py-4 rounded-xl font-display font-bold text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition flex items-center justify-center gap-2"
+                className="w-full bg-brand-leaf text-white py-4 rounded-full font-display font-bold hover:brightness-110 disabled:opacity-50 transition flex items-center justify-center gap-2 shadow-lg shadow-brand-leaf/25"
               >
                 {isPlacingOrder ? (
                   <>

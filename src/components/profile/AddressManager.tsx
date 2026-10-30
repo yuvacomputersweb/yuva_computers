@@ -194,7 +194,7 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
               } ${
                 isSelected
                   ? 'border-primary bg-primary/5 shadow-sm'
-                  : 'border-border/30 hover:border-border'
+                  : 'border-border hover:border-border'
               }`}
             >
               {/* Selection indicator (checkout mode) */}
@@ -280,7 +280,7 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
 
       {/* Address Form */}
       {showForm && (
-        <div className="border border-border/30 rounded-xl p-5 space-y-4 bg-muted/20">
+        <div className="border border-border rounded-xl p-5 space-y-4 bg-muted/20">
           <h4 className="font-semibold text-sm text-foreground">
             {editing ? 'Edit Address' : 'New Address'}
           </h4>
@@ -293,7 +293,7 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
               <select
                 value={form.label}
                 onChange={(e) => setForm(f => ({ ...f, label: e.target.value }))}
-                className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option>Home</option>
                 <option>Office</option>
@@ -320,7 +320,7 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
                 <input
                   value={(form as any)[key]}
                   onChange={(e) => setForm(f => ({ ...f, [key]: e.target.value }))}
-                  className="w-full border border-border/30 rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             ))}
@@ -330,13 +330,13 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="gradient-primary text-primary-foreground px-6 py-2 rounded-lg text-sm font-bold disabled:opacity-60 transition"
+              className="bg-brand-navy text-white px-6 py-2 rounded-lg text-sm font-bold disabled:opacity-60 transition"
             >
               {saving ? 'Saving...' : editing ? 'Update Address' : 'Save Address'}
             </button>
             <button
               onClick={() => setShowForm(false)}
-              className="px-5 py-2 rounded-lg text-sm text-muted-foreground border border-border/30 hover:bg-muted transition"
+              className="px-5 py-2 rounded-lg text-sm text-muted-foreground border border-border hover:bg-muted transition"
             >
               Cancel
             </button>

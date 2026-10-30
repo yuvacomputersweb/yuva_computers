@@ -1,13 +1,17 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   ShoppingCart, Search, User, Menu, X,
-  ChevronDown, Package, LogOut, Loader2
+  ChevronDown, Package, LogOut, Loader2, Phone, MessageCircle, Heart, Sparkles, Tag,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { storeService } from "@/services/api";
+import { SITE, SALE, TRUST_POINTS, isSaleLive, whatsappLink } from "@/lib/site";
+import { useShopLists } from "@/contexts/ShopListsContext";
+import HelpMeChoose from "./HelpMeChoose";
 import MegaMenu from "./MegaMenu";
+import BrandLogo from "./BrandLogo";
 
 interface SearchResult {
   id: number;
@@ -22,27 +26,82 @@ interface SearchResult {
   discount_percentage: number;
 }
 
+const navLinks = [
+  { label: "Home", path: "/" },
+  { label: "Shop", path: "/products", hasMega: true },
+  { label: "Bulk Orders", path: "/bulk-orders" },
+  { label: "Stores", path: "/stores" },
+  { label: "Company", path: "/company" },
+  { label: "Contact", path: "/contact" },
+];
+
+/** Seasonal sale bar; disappears on its own once the sale ends. */
+const SaleBar = () => {
+  if (!SALE || !isSaleLive()) return null;
+  const ends = new Date(SALE.endsAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  return (
+    <Link to={SALE.href} className="block bg-brand-leaf text-white text-xs sm:text-sm hover:brightness-105">
+      <div className="container mx-auto px-4 md:px-6 py-2 flex items-center justify-center gap-2 text-center">
+        <Tag className="w-4 h-4 shrink-0 hidden sm:block" />
+        <span>
+          <strong className="font-bold">{SALE.title}:</strong> {SALE.text} · till {ends}
+        </span>
+      </div>
+    </Link>
+  );
+};
+
+/** Thin navy strip with the store's guarantees, scrolling on small screens. */
+const TrustStrip = () => {
+  const items = [...TRUST_POINTS, ...TRUST_POINTS];
+  return (
+    <div className="bg-brand-navy text-white/80 text-xs">
+      <div className="container mx-auto px-4 md:px-6 h-9 flex items-center justify-between gap-6">
+        <div className="relative flex-1 overflow-hidden">
+          <div className="flex w-max animate-marquee lg:animate-none gap-10">
+            {items.map(({ icon: Icon, title }, i) => (
+              <span
+                key={i}
+                aria-hidden={i >= TRUST_POINTS.length}
+                className={`flex items-center gap-1.5 whitespace-nowrap ${i >= TRUST_POINTS.length ? "lg:hidden" : ""}`}
+              >
+                <Icon className="w-3.5 h-3.5 text-brand-leaf" />
+                {title}
+              </span>
+            ))}
+          </div>
+        </div>
+        <a href={`tel:+91${SITE.phone}`} className="hidden lg:flex items-center gap-1.5 shrink-0 hover:text-white">
+          <Phone className="w-3.5 h-3.5" /> {SITE.phoneDisplay}
+        </a>
+      </div>
+    </div>
+  );
+};
+
 const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
-  const { isLoggedIn, user, logout } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [menuData, setMenuData] = useState<{ categories: any[]; usageTags: any[]; brands: any[] }>({ 
-    categories: [], 
+  const [menuData, setMenuData] = useState<{ categories: any[]; usageTags: any[]; brands: any[] }>({
+    categories: [],
     usageTags: [],
     brands: []
   });
-  
+
   // SEARCH STATE
-  const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
   const [searchResults, setSearchResults] = useState<{ products: SearchResult[] }>({ products: [] });
   const [isSearching, setIsSearching] = useState(false);
-  
-  const searchRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+
+  const searchRef = useRef<HTMLFormElement>(null);
+  const mobileSearchRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
   const { totalItems, setDrawerOpen } = useCart();
+  const { wishlist } = useShopLists();
+  const [quizOpen, setQuizOpen] = useState(false);
 
   useEffect(() => {
     const fetchMenuData = async () => {
@@ -59,7 +118,6 @@ const Navbar = () => {
     };
     fetchMenuData();
   }, []);
-  
 
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
@@ -80,8 +138,20 @@ const Navbar = () => {
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
-  const toggleSearch = () => {
-    setSearchOpen(!searchOpen);
+  // Close the search dropdown when clicking anywhere else
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (!searchRef.current?.contains(target) && !mobileSearchRef.current?.contains(target)) {
+        setSearchFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
+  const resetSearch = () => {
+    setSearchFocused(false);
     setSearchQuery("");
     setSearchResults({ products: [] });
   };
@@ -90,162 +160,251 @@ const Navbar = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchOpen(false);
-      setSearchQuery("");
-      setSearchResults({ products: [] });
+      resetSearch();
     }
   };
 
-  const navLinks = [
-    { label: "Home", path: "/" },
-    { label: "Products", path: "/products", hasMega: true },
-    { label: "Bulk Orders", path: "/bulk-orders" },
-    { label: "Company", path: "/company" },
-    { label: "Stores", path: "/stores" },
-    { label: "Contact Us", path: "/contact" },
-  ];
+  const showResults = searchFocused && searchQuery.length > 0;
+
+  const renderSearch = (ref: React.RefObject<HTMLFormElement>, className: string) => (
+    <form ref={ref} onSubmit={handleSearchSubmit} role="search" className={`relative ${className}`}>
+      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+      <input
+        type="search"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onFocus={() => setSearchFocused(true)}
+        placeholder="Search laptops & brands…"
+        aria-label="Search products"
+        className="w-full h-11 pl-11 pr-24 rounded-full bg-muted border border-transparent focus:border-primary/40 focus:bg-white focus:ring-4 focus:ring-primary/10 outline-none text-sm transition"
+      />
+      <button
+        type="submit"
+        className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 px-4 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90"
+      >
+        Search
+      </button>
+
+      {showResults && (
+        <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-border overflow-hidden z-50">
+          <div className="max-h-96 overflow-y-auto">
+            {isSearching ? (
+              <div className="p-6 text-center"><Loader2 className="animate-spin mx-auto text-primary" /></div>
+            ) : searchResults.products.length === 0 ? (
+              <p className="p-5 text-sm text-muted-foreground">No products match “{searchQuery}”.</p>
+            ) : (
+              searchResults.products.map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/product/${product.slug}`}
+                  onClick={resetSearch}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted border-b border-border last:border-b-0"
+                >
+                  <div className="w-12 h-12 rounded-lg bg-muted shrink-0 overflow-hidden">
+                    {product.image && <img src={product.image} alt="" className="w-full h-full object-contain" />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{product.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {product.brand_name} · <span className="text-foreground font-semibold">₹{Number(product.price).toLocaleString("en-IN")}</span>
+                    </p>
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
+          {searchResults.products.length > 0 && (
+            <button type="submit" className="w-full px-4 py-3 text-sm font-semibold text-primary bg-muted/60 hover:bg-muted text-left">
+              See all results for “{searchQuery}”
+            </button>
+          )}
+        </div>
+      )}
+    </form>
+  );
+
+  const iconButton = "relative w-10 h-10 grid place-items-center rounded-full hover:bg-muted transition-colors";
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background border-b border-border">
-        <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-20 md:h-24">
-          <div className="flex items-center gap-1 shrink-0">
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-1 text-foreground -ml-1 mr-1 hover:bg-muted rounded">
-              {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      <SaleBar />
+      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur border-b border-border">
+        <TrustStrip />
+
+        {/* MAIN ROW */}
+        <div className="container mx-auto px-4 md:px-6 flex items-center gap-4 lg:gap-8 h-16 md:h-[72px]">
+          <button
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
+            className="lg:hidden -ml-2 w-10 h-10 grid place-items-center rounded-full hover:bg-muted"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
+          <Link to="/" className="shrink-0" aria-label="Yuva Computers home">
+            <BrandLogo />
+          </Link>
+
+          {renderSearch(searchRef, "hidden md:block flex-1 max-w-2xl")}
+
+          <div className="flex items-center gap-1 ml-auto shrink-0">
+            <button
+              onClick={() => setQuizOpen(true)}
+              className="hidden xl:flex items-center gap-2 h-10 px-4 mr-1 rounded-full border border-border text-sm font-semibold hover:border-brand-leaf hover:text-brand-leaf-dark transition-colors"
+            >
+              <Sparkles className="w-4 h-4 text-brand-leaf" /> Help me choose
             </button>
-            <Link to="/" onClick={() => setMobileOpen(false)}>
-              <img src="/logo.png" className="h-14 md:h-20 w-auto object-contain" />
+
+            <Link to="/wishlist" aria-label="Wishlist" className={`hidden sm:grid ${iconButton}`}>
+              <Heart className="w-5 h-5" />
+              {wishlist.length > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 grid place-items-center text-[10px] font-bold bg-brand-navy text-white rounded-full">
+                  {wishlist.length}
+                </span>
+              )}
             </Link>
-          </div>
 
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <div key={link.label} className="relative" onMouseEnter={() => link.hasMega && setMegaOpen(true)}>
-                <Link to={link.path} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1">
-                  {link.label} {link.hasMega && <ChevronDown className="w-3 h-3" />}
-                </Link>
-              </div>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2 shrink-0" ref={searchRef}>
-            <button onClick={toggleSearch} className="p-2 hover:bg-muted rounded-lg transition-all">
-              {searchOpen ? <X className="w-5 h-5 text-primary" /> : <Search className="w-5 h-5" />}
-            </button>
-            <button onClick={() => setDrawerOpen(true)} className="relative p-2 hover:bg-muted rounded-lg">
+            <button onClick={() => setDrawerOpen(true)} aria-label="Open cart" className={iconButton}>
               <ShoppingCart className="w-5 h-5" />
-              {totalItems > 0 && <span className="absolute -top-1 -right-1 text-xs bg-black text-white px-1 rounded">{totalItems}</span>}
+              {totalItems > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 grid place-items-center text-[10px] font-bold bg-brand-leaf text-white rounded-full">
+                  {totalItems}
+                </span>
+              )}
             </button>
+
             {isLoggedIn ? (
               <div className="relative">
-  <button
-    onClick={() => setProfileOpen((prev) => !prev)}
-    className="flex items-center gap-1 p-2 hover:bg-muted rounded-lg"
-  >
-    <User size={20} />
-  </button>
-
-  {profileOpen && (
-    <div className="absolute right-0 top-full mt-2 w-40 bg-white border shadow-xl rounded-lg p-2 z-50">
-      <button
-        onClick={() => {
-          setProfileOpen(false);
-          navigate("/profile");
-        }}
-        className="block w-full p-2 text-sm text-left hover:bg-muted"
-      >
-        <Package size={16} className="inline mr-2" />
-        Profile
-      </button>
-
-      <button
-        onClick={() => {
-          logout();
-          setProfileOpen(false);
-          navigate("/");
-        }}
-        className="block w-full p-2 text-sm text-red-600 text-left hover:bg-muted"
-      >
-        <LogOut size={16} className="inline mr-2" />
-        Logout
-      </button>
-    </div>
-  )}
-</div>
-            ) : <button onClick={() => navigate("/login")} className="p-2 hover:bg-muted rounded-lg"><User size={20}/></button>}
+                <button onClick={() => setProfileOpen((prev) => !prev)} aria-label="Account" className={iconButton}>
+                  <User className="w-5 h-5" />
+                </button>
+                {profileOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-44 bg-white border border-border shadow-xl rounded-xl p-1.5 z-50">
+                    <button
+                      onClick={() => { setProfileOpen(false); navigate("/profile"); }}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-lg text-left hover:bg-muted"
+                    >
+                      <Package size={16} /> My orders & profile
+                    </button>
+                    <button
+                      onClick={() => { logout(); setProfileOpen(false); navigate("/"); }}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-lg text-red-600 text-left hover:bg-muted"
+                    >
+                      <LogOut size={16} /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="hidden sm:flex items-center gap-2 h-10 px-4 ml-1 rounded-full bg-brand-navy text-white text-sm font-semibold hover:bg-brand-navy-soft"
+              >
+                <User className="w-4 h-4" /> Login
+              </button>
+            )}
+            {!isLoggedIn && (
+              <button onClick={() => navigate("/login")} aria-label="Login" className={`sm:hidden ${iconButton}`}>
+                <User className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
 
-        {megaOpen && (
-          <div onMouseLeave={() => setMegaOpen(false)} className="relative">
-            <MegaMenu onClose={() => setMegaOpen(false)} categories={menuData.categories} usageTags={menuData.usageTags} brands={menuData.brands} />
-          </div>
-        )}
+        {/* MOBILE SEARCH */}
+        <div className="md:hidden container mx-auto px-4 pb-3">
+          {renderSearch(mobileSearchRef, "w-full")}
+        </div>
 
-        {searchOpen && (
-          <div className="absolute top-full left-0 w-full z-50 bg-white shadow-2xl border-b animate-in slide-in-from-top-2">
-            <div className="container mx-auto px-4 py-4">
-              <form onSubmit={handleSearchSubmit} className="relative bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <div className="p-2">
-                  <input
-                    ref={inputRef}
-                    autoFocus
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products, brands, categories..."
-                    className="w-full py-3 px-4 text-base border-none outline-none"
-                  />
-                </div>
-                <div className="max-h-96 overflow-y-auto border-t">
-                  {isSearching ? <div className="p-8 text-center"><Loader2 className="animate-spin mx-auto text-primary" /></div> : 
-                   searchResults.products.map((product) => (
-                    <Link key={product.id} to={`/product/${product.slug}`} onClick={() => setSearchOpen(false)} className="flex gap-4 p-4 hover:bg-muted border-b">
-                      {/* Image section removed */}
-                      <div>
-                        <div className="font-semibold">{product.title}</div>
-                        <div className="text-sm text-primary">₹{product.price}</div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </form>
-            </div>
+        {/* DESKTOP NAV ROW */}
+        <nav className="relative hidden lg:block border-t border-border" onMouseLeave={() => setMegaOpen(false)}>
+          <div className="container mx-auto px-6 flex items-center gap-1 h-11">
+            {navLinks.map((link) => (
+              <div key={link.label} onMouseEnter={() => setMegaOpen(!!link.hasMega)}>
+                <NavLink
+                  to={link.path}
+                  end={link.path === "/"}
+                  className={({ isActive }) =>
+                    `flex items-center gap-1 px-3 h-11 text-sm font-medium border-b-2 transition-colors ${
+                      isActive ? "border-brand-leaf text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                    }`
+                  }
+                >
+                  {link.label} {link.hasMega && <ChevronDown className="w-3.5 h-3.5" />}
+                </NavLink>
+              </div>
+            ))}
+            <Link
+              to="/products?is_best_deal=true"
+              className="ml-auto text-sm font-semibold text-brand-leaf-dark hover:underline"
+            >
+              Today’s best deals →
+            </Link>
           </div>
-        )}
+          {megaOpen && (
+            <div className="absolute left-0 right-0 top-full">
+              <MegaMenu onClose={() => setMegaOpen(false)} categories={menuData.categories} usageTags={menuData.usageTags} brands={menuData.brands} />
+            </div>
+          )}
+        </nav>
       </header>
 
-      {/* MOBILE HAMBURGER MENU - Your existing code (unchanged) */}
+      <HelpMeChoose open={quizOpen} onClose={() => setQuizOpen(false)} />
+
+      {/* MOBILE DRAWER */}
       {mobileOpen && (
         <>
           <div className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[99]" onClick={() => setMobileOpen(false)} />
-          <div className="lg:hidden fixed left-0 top-0 h-full w-80 bg-white shadow-2xl z-[100] transform transition-transform duration-300 ease-in-out translate-x-0 flex flex-col">
+          <div className="lg:hidden fixed left-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl z-[100] flex flex-col animate-in slide-in-from-left duration-300">
             <div className="p-4 border-b flex items-center justify-between shrink-0">
-              <Link to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
-                <img src="/logo.png" className="h-9 w-auto object-contain" alt="Logo" />
+              <Link to="/" onClick={() => setMobileOpen(false)}>
+                <BrandLogo />
               </Link>
-              <button onClick={() => setMobileOpen(false)} className="p-2 hover:bg-muted rounded-lg transition-colors">
+              <button onClick={() => setMobileOpen(false)} aria-label="Close menu" className="w-10 h-10 grid place-items-center rounded-full hover:bg-muted">
                 <X className="w-6 h-6" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              <Link to="/" onClick={() => setMobileOpen(false)} className="block py-3 px-3 font-bold text-lg border-b border-gray-200 hover:text-primary transition-colors">
+              <Link to="/" onClick={() => setMobileOpen(false)} className="block py-3 px-3 font-bold text-lg border-b border-border">
                 Home
               </Link>
-              <div className="py-2 border-b border-gray-200">
-                <MegaMenu 
+              <div className="py-2 border-b border-border">
+                <MegaMenu
                   onClose={() => setMobileOpen(false)}
                   categories={menuData.categories}
                   usageTags={menuData.usageTags}
                   isMobile={true}
                 />
               </div>
-              <div className="pt-3 space-y-1">
-                <Link to="/bulk-orders" onClick={() => setMobileOpen(false)} className="block py-2.5 px-3 font-semibold text-sm hover:text-primary transition-colors border-b border-gray-100 last:border-b-0">Bulk Orders</Link>
-                <Link to="/company" onClick={() => setMobileOpen(false)} className="block py-2.5 px-3 font-semibold text-sm hover:text-primary transition-colors border-b border-gray-100 last:border-b-0">Company</Link>
-                <Link to="/stores" onClick={() => setMobileOpen(false)} className="block py-2.5 px-3 font-semibold text-sm hover:text-primary transition-colors border-b border-gray-100 last:border-b-0">Stores</Link>
-                <Link to="/contact" onClick={() => setMobileOpen(false)} className="block py-2.5 px-3 font-semibold text-sm hover:text-primary transition-colors">Contact Us</Link>
+              <div className="pt-1">
+                <button
+                  onClick={() => { setMobileOpen(false); setQuizOpen(true); }}
+                  className="w-full flex items-center gap-2 py-3 px-3 font-semibold text-sm border-b border-border text-brand-leaf-dark"
+                >
+                  <Sparkles className="w-4 h-4" /> Help me choose a laptop
+                </button>
+                <Link to="/wishlist" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-3 px-3 font-semibold text-sm border-b border-border">
+                  <Heart className="w-4 h-4" /> Wishlist {wishlist.length > 0 && `(${wishlist.length})`}
+                </Link>
+                {navLinks.filter((l) => !["/", "/products"].includes(l.path)).map((l) => (
+                  <Link
+                    key={l.path}
+                    to={l.path}
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-3 px-3 font-semibold text-sm border-b border-border last:border-b-0 hover:text-primary"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
               </div>
+            </div>
+            <div className="p-4 border-t grid grid-cols-2 gap-2 shrink-0">
+              <a href={`tel:+91${SITE.phone}`} className="flex items-center justify-center gap-2 h-11 rounded-full border border-border text-sm font-semibold">
+                <Phone className="w-4 h-4" /> Call
+              </a>
+              <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-11 rounded-full bg-brand-leaf text-white text-sm font-semibold">
+                <MessageCircle className="w-4 h-4" /> WhatsApp
+              </a>
             </div>
           </div>
         </>

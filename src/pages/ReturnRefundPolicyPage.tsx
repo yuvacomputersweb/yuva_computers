@@ -1,5 +1,6 @@
 import { Phone, Mail, ShieldCheck } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import PageHero from "@/components/PageHero";
 
 const POLICY_SECTIONS = [
   {
@@ -11,7 +12,7 @@ const POLICY_SECTIONS = [
   {
     title: "2. Return Window",
     body: [
-      "Online and remote orders: You may raise a return request within 7 calendar days from the date of delivery.",
+      "Online and remote orders: If the device arrives damaged or develops any problem, you may raise a replacement request within 15 calendar days from the date of delivery.",
       "In-store purchases: As stated on the invoice, goods sold in store are not returnable. In-store purchases are protected instead by the 15-day testing warranty, which entitles you to repair or replacement of a defective unit — not a refund.",
     ],
   },
@@ -120,7 +121,7 @@ const POLICY_SECTIONS = [
     title: "13. Relationship to Warranty",
     body: [
       "This return policy and our warranty are separate protections.",
-      "The return window (7 days, online orders) covers defective, damaged, or incorrect deliveries.",
+      "The replacement window (15 days, online orders) covers damaged, defective, or incorrect deliveries.",
       "The warranty continues after the return window and covers RAM and hard disk free replacement for 1 year, motherboard repair for 1 year, and free service for the life of your ownership. Apple laptops from Yuva iStore carry 6 months free service warranty.",
     ],
   },
@@ -149,29 +150,21 @@ const ReturnRefundPolicyPage = () => {
     <>
       <SEO
         title="Return & Refund Policy | Yuva Computers"
-        description="Read Yuva Computers' return and refund policy for certified refurbished laptops and Apple devices. 7-day return window for online orders, inspection process, and refund timelines."
+        description="Read Yuva Computers' return and refund policy for certified refurbished laptops and Apple devices. 15-day replacement window for online orders, inspection process, and refund timelines."
         canonical="/returns-refund-policy"
         jsonLd={policySchema}
       />
 
-      {/* Hero */}
-      <section className="py-16 lg:py-24 bg-surface-low">
-        <div className="container mx-auto px-6">
-          <h1 className="font-display font-extrabold text-4xl lg:text-5xl text-foreground tracking-tight max-w-3xl">
-            Return & Refund Policy
-          </h1>
-          <p className="text-muted-foreground mt-4 max-w-2xl">
-            This policy applies to purchases made through yuvacomputers.in and
-            to orders placed remotely by phone or WhatsApp. Purchases made in
-            person at a Yuva branch are governed by the terms printed on the
-            invoice.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Policies"
+        title="Return &amp; Refund Policy"
+        text="This policy applies to purchases made through yuvacomputers.in and to orders placed remotely by phone or WhatsApp. Purchases made in person at a Yuva branch are governed by the terms printed on the invoice."
+        crumbs={[{ label: "Return & refund policy" }]}
+      />
 
       {/* Sections */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-6 max-w-3xl">
+      <section className="py-12 md:py-20">
+        <div className="container mx-auto px-4 md:px-6 max-w-3xl">
           <div className="space-y-10">
             {POLICY_SECTIONS.map((section) => (
               <div key={section.title}>
@@ -190,7 +183,7 @@ const ReturnRefundPolicyPage = () => {
           </div>
 
           {/* Contact */}
-          <div className="mt-16 bg-surface-low rounded-xl p-8">
+          <div className="mt-16 bg-muted/60 rounded-3xl p-6 md:p-8">
             <h2 className="font-display font-extrabold text-xl text-foreground tracking-tight mb-4">
               14. Contact
             </h2>
@@ -202,7 +195,7 @@ const ReturnRefundPolicyPage = () => {
               {CONTACTS.map((c) => (
                 <div
                   key={c.label}
-                  className="flex items-start gap-3 bg-card rounded-lg p-4"
+                  className="flex items-start gap-3 bg-card rounded-2xl border border-border p-4"
                 >
                   <Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                   <div>
@@ -212,7 +205,7 @@ const ReturnRefundPolicyPage = () => {
                 </div>
               ))}
             </div>
-            <div className="flex items-start gap-3 mt-4 bg-card rounded-lg p-4">
+            <div className="flex items-start gap-3 mt-4 bg-card rounded-2xl border border-border p-4">
               <Mail className="w-4 h-4 text-primary mt-0.5 shrink-0" />
               <div>
                 <p className="font-display font-semibold text-foreground text-sm">Email</p>

@@ -6,6 +6,10 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { SEO } from "@/components/SEO";
+import BrandLogo from "@/components/BrandLogo";
+import { TRUST_POINTS } from "@/lib/site";
+
+const HAS_GOOGLE_CLIENT = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -79,18 +83,36 @@ export default function LoginPage() {
   return (
     <>
     <SEO title="Account Sign In | Yuva Computers" noindex={true} />
-    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4">
-      <div className="max-w-md w-full bg-card border border-border rounded-2xl shadow-ambient p-8 md:p-10 space-y-8">
+    <div className="container mx-auto px-4 md:px-6 py-10 md:py-16 grid lg:grid-cols-2 gap-10 items-center">
+      {/* Benefits panel (desktop) */}
+      <div className="hidden lg:flex flex-col justify-between self-stretch rounded-[2rem] bg-hero text-white p-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-faint" />
+        <div className="relative">
+          <BrandLogo dark />
+          <h1 className="mt-12 font-display font-extrabold text-4xl tracking-tight leading-tight">
+            Your laptops, orders and warranty — in one place.
+          </h1>
+        </div>
+        <ul className="relative space-y-4 mt-10">
+          {TRUST_POINTS.map(({ icon: Icon, title, text }) => (
+            <li key={title} className="flex gap-3">
+              <span className="w-10 h-10 rounded-xl bg-white/10 text-brand-leaf grid place-items-center shrink-0"><Icon className="w-5 h-5" /></span>
+              <span>
+                <span className="block font-semibold">{title}</span>
+                <span className="block text-sm text-white/60">{text}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="max-w-md w-full mx-auto bg-card border border-border rounded-3xl shadow-xl shadow-black/[0.03] p-7 md:p-10 space-y-8">
 
         {/* Header */}
         <div className="text-center space-y-2">
-          <img
-            src="/logo.png"
-            alt="Yuva Computers"
-            className="h-16 w-16 mx-auto rounded-xl object-contain border border-border shadow-sm"
-          />
-          <h2 className="text-2xl font-display font-bold text-foreground">
-            {isLogin ? "Welcome Back" : "Create Account"}
+          <img src="/logo-symbol.png" alt="" className="h-12 w-auto mx-auto lg:hidden" />
+          <h2 className="text-3xl font-display font-extrabold tracking-tight text-foreground">
+            {isLogin ? "Welcome back" : "Create your account"}
           </h2>
           <p className="text-sm text-muted-foreground">
             {isLogin
@@ -185,7 +207,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full gradient-primary text-primary-foreground rounded-xl py-3 font-display font-bold text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-60 transition flex items-center justify-center gap-2"
+            className="w-full bg-brand-navy text-white rounded-full h-12 font-semibold hover:bg-brand-navy-soft disabled:opacity-60 transition flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <Loader2 className="animate-spin w-4 h-4" />
@@ -197,6 +219,9 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* Google sign-in needs VITE_GOOGLE_CLIENT_ID; without it the hook throws and blanks the page. */}
+        {HAS_GOOGLE_CLIENT && (
+          <>
         {/* Divider */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -224,6 +249,8 @@ export default function LoginPage() {
             }
           }}
         />
+          </>
+        )}
 
         {/* Toggle */}
         <p className="text-center text-xs text-muted-foreground">
@@ -261,7 +288,7 @@ function GoogleLoginButton({ onSuccess }: { onSuccess: (code: string) => void })
     <button
       type="button"
       onClick={() => googleLogin()}
-      className="w-full flex items-center justify-center gap-3 border border-border rounded-xl py-3 text-sm font-medium text-foreground hover:bg-muted transition"
+      className="w-full flex items-center justify-center gap-3 border border-border rounded-full h-12 text-sm font-semibold text-foreground hover:bg-muted transition"
     >
       <GoogleIcon />
       Continue with Google
@@ -287,7 +314,7 @@ function GoogleButtonInner({
     <button
       type="button"
       onClick={() => googleLogin()}
-      className="w-full flex items-center justify-center gap-3 border border-border rounded-xl py-3 text-sm font-medium text-foreground hover:bg-muted transition"
+      className="w-full flex items-center justify-center gap-3 border border-border rounded-full h-12 text-sm font-semibold text-foreground hover:bg-muted transition"
     >
       <GoogleIcon />
       Continue with Google

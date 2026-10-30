@@ -1,5 +1,6 @@
 //cartdrawer
-import { X, Minus, Plus, ShoppingBag, Trash2, ArrowRight } from "lucide-react";
+import { X, Minus, Plus, ShoppingBag, Trash2, ArrowRight, ShieldCheck, Store } from "lucide-react";
+import { ProductImage } from "./ProductCard";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 
@@ -18,53 +19,50 @@ const CartDrawer = () => {
       <div className="fixed top-0 right-0 h-full w-full max-w-md bg-card z-[70] shadow-2xl flex flex-col animate-slide-in-right">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border/30">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-primary" />
+            <ShoppingBag className="w-5 h-5 text-brand-leaf-dark" />
             <h2 className="font-display font-bold text-lg text-foreground">
-              Cart ({totalItems})
+              Your cart ({totalItems})
             </h2>
           </div>
           <button
             onClick={() => setDrawerOpen(false)}
-            className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
+            aria-label="Close cart"
+            className="w-10 h-10 grid place-items-center text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <ShoppingBag className="w-14 h-14 text-muted-foreground/20 mb-4" />
-              <p className="font-display font-semibold text-foreground">Cart is empty</p>
-              <p className="text-muted-foreground text-sm mt-1">Add products to get started.</p>
+              <span className="w-16 h-16 rounded-2xl bg-muted grid place-items-center mb-4">
+                <ShoppingBag className="w-8 h-8 text-muted-foreground/50" />
+              </span>
+              <p className="font-display font-bold text-lg text-foreground">Your cart is empty</p>
+              <p className="text-muted-foreground text-sm mt-1">Find a certified laptop that fits your budget.</p>
               <button
                 onClick={() => { setDrawerOpen(false); navigate('/products'); }}
-                className="mt-4 gradient-primary text-primary-foreground px-6 py-2 rounded-lg text-sm font-bold"
+                className="mt-5 h-11 px-6 rounded-full bg-brand-navy text-white text-sm font-semibold"
               >
-                Browse Products
+                Browse laptops
               </button>
             </div>
           ) : (
             items.map((item) => (
-              <div key={item.id} className="flex gap-4 bg-muted/30 rounded-xl p-3">
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-20 h-20 object-contain rounded-lg bg-card p-1 border border-border/20 shrink-0"
-                  />
-                ) : (
-                  <div className="w-20 h-20 bg-muted rounded-lg shrink-0" />
-                )}
+              <div key={item.id} className="flex gap-3 rounded-2xl border border-border p-3">
+                <div className="w-20 h-20 rounded-xl bg-muted shrink-0 overflow-hidden">
+                  <ProductImage src={item.image} alt={item.name} className="w-full h-full p-1.5" />
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-display font-semibold text-sm text-foreground line-clamp-2 leading-tight">
                     {item.name}
                   </p>
                   {item.variant && (
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {item.variant}
                     </p>
                   )}
@@ -77,7 +75,7 @@ const CartDrawer = () => {
                         if (item.quantity === 1) removeFromCart(item.id);
                         else updateQuantity(item.id, item.quantity - 1);
                       }}
-                      className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+                      className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
                     >
                       {item.quantity === 1
                         ? <Trash2 className="w-3 h-3 text-destructive" />
@@ -86,7 +84,7 @@ const CartDrawer = () => {
                     <span className="text-sm font-bold w-6 text-center">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+                      className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
@@ -105,21 +103,23 @@ const CartDrawer = () => {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="px-6 py-5 border-t border-border/30 space-y-4 bg-card">
+          <div className="px-5 py-5 border-t border-border space-y-4 bg-card">
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground text-sm">Subtotal</span>
               <span className="font-display font-extrabold text-xl text-foreground">
                 ₹{totalPrice.toLocaleString('en-IN')}
               </span>
             </div>
-            <p className="text-[10px] text-muted-foreground text-center">
-              Shipping & taxes calculated at checkout
-            </p>
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-medium text-muted-foreground">
+              <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-brand-leaf-dark" /> 50-point checked</span>
+              <span className="flex items-center gap-1.5"><Store className="w-3.5 h-3.5 text-brand-leaf-dark" /> Free store pickup</span>
+            </div>
+            <p className="text-xs text-muted-foreground">Delivery charges, if any, are shown at checkout.</p>
             <button
               onClick={() => { setDrawerOpen(false); navigate('/checkout'); }}
-              className="w-full gradient-primary text-primary-foreground py-4 rounded-xl font-display font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+              className="w-full h-13 py-4 rounded-full bg-brand-leaf text-white font-bold hover:brightness-110 transition flex items-center justify-center gap-2"
             >
-              Proceed to Checkout <ArrowRight className="w-4 h-4" />
+              Checkout securely <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}

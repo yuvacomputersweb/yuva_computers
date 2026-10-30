@@ -1,22 +1,26 @@
-import { Wrench, ShieldCheck, RotateCcw } from "lucide-react";
+import { Wrench, ShieldCheck, RotateCcw, BadgeCheck } from "lucide-react";
 
 export default function TrustBadges({ product }: { product: any }) {
   if (!product) return null;
 
+  // Per-product values come from the admin; fall back to store-wide policy.
+  const items = [
+    { icon: BadgeCheck, text: product.refurbishment_summary || "50-point quality check" },
+    { icon: ShieldCheck, text: product.warranty_period || "Warranty included" },
+    { icon: RotateCcw, text: product.return_policy || "15-day replacement" },
+    { icon: Wrench, text: product.service_centers || "Service at every Yuva store" },
+  ];
+
   return (
-    <div className="grid grid-cols-3 gap-2 text-[10px] md:text-xs font-bold text-muted-foreground bg-muted/20 p-3 rounded-xl">
-      <div className="flex flex-col items-center text-center gap-1">
-        <Wrench size={20} className="text-primary"/>
-        <span>{product.service_centers}</span>
-      </div>
-      <div className="flex flex-col items-center text-center gap-1">
-        <ShieldCheck size={20} className="text-primary"/>
-        <span>{product.warranty_period}</span>
-      </div>
-      <div className="flex flex-col items-center text-center gap-1">
-        <RotateCcw size={20} className="text-primary"/>
-        <span>{product.return_policy}</span>
-      </div>
+    <div className="grid grid-cols-2 gap-2">
+      {items.map(({ icon: Icon, text }) => (
+        <div key={text} className="flex items-center gap-2.5 rounded-xl border border-border p-3 text-xs font-semibold">
+          <span className="w-8 h-8 shrink-0 rounded-lg bg-brand-leaf/15 text-brand-leaf-dark grid place-items-center">
+            <Icon size={16} />
+          </span>
+          {text}
+        </div>
+      ))}
     </div>
   );
 }

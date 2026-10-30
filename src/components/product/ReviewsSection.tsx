@@ -47,13 +47,13 @@ export default function ReviewSection({ product, activeVariant }: { product: any
   };
 
   return (
-    <section className="py-12 border-t mt-12 relative">
+    <section className="relative">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-extrabold">Customer Reviews</h2>
+        <h2 className="font-display text-2xl md:text-3xl font-extrabold tracking-tight">Customer reviews</h2>
         {/* Toggle Form Open directly */}
         <button 
           onClick={() => authService.isLoggedIn() ? setIsFormOpen(!isFormOpen) : navigate("/login")} 
-          className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-bold"
+          className="h-10 px-5 rounded-full bg-brand-navy text-white text-sm font-semibold"
         >
           {isFormOpen ? "Cancel" : "Write a Review"}
         </button>
@@ -97,7 +97,7 @@ export default function ReviewSection({ product, activeVariant }: { product: any
 
         <div ref={scrollRef} className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide">
           {sortedReviews.map((r: any) => (
-            <div key={r.id} className="min-w-[320px] p-6 border rounded-2xl bg-card shadow-sm flex flex-col gap-3">
+            <div key={r.id} className="min-w-[300px] p-6 border border-border rounded-2xl bg-card flex flex-col gap-3">
                <div className="flex items-center gap-4">
                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shrink-0 text-xl">
                     {r.user_name?.charAt(0).toUpperCase()}

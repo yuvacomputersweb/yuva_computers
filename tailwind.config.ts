@@ -46,6 +46,13 @@ export default {
           soft: "hsl(var(--success-soft))",
         },
         "brand-green-light": "hsl(var(--brand-green-light))",
+        brand: {
+          navy: "hsl(var(--brand-navy))",
+          "navy-soft": "hsl(var(--brand-navy-soft))",
+          sky: "hsl(var(--brand-sky))",
+          leaf: "hsl(var(--brand-leaf))",
+          "leaf-dark": "hsl(var(--brand-leaf-dark))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
