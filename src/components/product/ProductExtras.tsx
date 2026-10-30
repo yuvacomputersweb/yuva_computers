@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { BellRing, CreditCard, Gift, MapPin, PackageCheck, Tag, Truck, Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { engageService, storeService, type Offer, type PincodeResult } from "@/services/api";
+import { engageService, type Offer, type PincodeResult } from "@/services/api";
+import { lines, useSiteConfig } from "@/lib/siteConfig";
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
@@ -122,21 +123,8 @@ export function OffersList({ price }: { price: number }) {
 
 /* ─── What's in the box ────────────────────────────────────────────────── */
 
-let boxCache: Promise<string[]> | null = null;
-const loadBox = () =>
-  (boxCache ??= storeService
-    .getSiteConfig()
-    .then((c: any) => String(c?.in_the_box ?? "").split("\n").map((s) => s.trim()).filter(Boolean))
-    .catch(() => {
-      boxCache = null;
-      return [] as string[];
-    }));
-
 export function InTheBox() {
-  const [items, setItems] = useState<string[]>([]);
-  useEffect(() => {
-    loadBox().then(setItems);
-  }, []);
+  const items = lines(useSiteConfig().in_the_box);
   if (!items.length) return null;
 
   return (
