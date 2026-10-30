@@ -84,17 +84,17 @@ export const FAQ_SECTIONS: FaqSection[] = [
       {
         question: "What warranty do I get?",
         answer:
-          "Coverage / Term — Testing warranty (as printed on invoice): 15 days. RAM — free replacement: 1 year. Hard disk / SSD — free replacement: 1 year. Motherboard — repairable warranty: 1 year. Free service on all laptops purchased from Yuva: Lifetime of ownership. Apple laptops (Yuva iStore) — free service warranty: 6 months. Yuva Service Lab repair warranty (on repairs done by us): 15 days.\n\n\"Repairable warranty\" on the motherboard means we repair the board free of charge within the warranty term. It does not include free replacement of the motherboard or of individual components other than RAM and hard disk.",
+          "It depends on the product — each product page shows its warranty. Laptops priced ₹15,000 and above: 15-day testing warranty, free RAM and hard disk / SSD replacement for 1 year, 1-year motherboard repair warranty (repairable faults, not replacement), free service at Yuva Service Lab and at least 1 hour of battery backup. Laptops and desktops under ₹15,000: 15-day testing warranty and free service. Laptops with dedicated graphics (NVIDIA / AMD graphics cards): 15-day testing warranty and 6 months of free service. Apple devices (Yuva iStore): 15-day exchange or replacement if the device is undamaged and in the same condition, 6 months of free service and at least 2 hours of battery backup. Monitors are tested before dispatch and sold without warranty. Free service covers labour only — spare parts other than those listed are chargeable. Full details are on our Warranty Policy page.",
       },
       {
         question: "What is not covered by warranty?",
         answer:
-          "Physical damage, drops, cracks, dents, or pressure marks. Burn damage, liquid damage, or damage from power surges. Screen and speakers (warranty not applicable). Battery beyond the stated minimum backup at the time of delivery. Software issues, virus infections, and data loss. Damage caused by unauthorised repair, opening, or third-party service.",
+          "Burn and physical damage (cracks, dents, broken body), keyboard, speakers and screen, liquid or water damage, battery beyond the minimum backup stated for the product, and spare parts not listed in the product's warranty.",
       },
       {
         question: "What voids the warranty?",
         answer:
-          "Every laptop we sell carries a Yuva warranty sticker/seal. If the seal or sticker is broken, tampered with, or removed, the warranty is void immediately. Please do not open the device or allow any outside technician to open it during the warranty period.",
+          "A broken, removed or tampered warranty sticker or seal; the device being opened or repaired outside Yuva Service Lab; a removed or mismatched serial number; or not producing the original invoice when you claim.",
       },
       {
         question: "How do I claim warranty?",
@@ -109,7 +109,7 @@ export const FAQ_SECTIONS: FaqSection[] = [
       {
         question: "Is service free?",
         answer:
-          "Free service is provided for all laptops purchased from Yuva Computers. Spare parts, if required outside warranty coverage, are chargeable.",
+          "Laptops from ₹15,000 and budget laptops get free service at Yuva Service Lab. Apple devices and laptops with dedicated graphics get 6 months of free service. Service is labour only — spare parts are chargeable unless the product's warranty covers them (RAM and hard disk / SSD on 1-year warranty laptops).",
       },
     ],
   },
@@ -179,17 +179,17 @@ export const FAQ_SECTIONS: FaqSection[] = [
       {
         question: "Can I return the laptop if I change my mind?",
         answer:
-          "Online orders carry a 15-day replacement window from the date of delivery for any damage or problem, or if the wrong item arrives. Returns purely for change of mind are not accepted, as each refurbished unit is individually sourced and configured.",
+          "No. Once goods are sold they cannot be returned. Within the 15-day testing period we exchange or replace a device that has a functional problem, provided it is undamaged and in the same condition as delivered.",
       },
       {
         question: "What if the laptop is faulty on arrival?",
         answer:
-          "Report it within 48 hours of delivery with an unboxing video and photographs. We will arrange a replacement or a repair, or issue a refund if a replacement is unavailable. Full details are in our Return & Refund Policy.",
+          "Contact us within 48 hours of delivery. Transit damage is on us, but we need an unboxing video recorded while opening the sealed package — please record one every time. Functional problems are handled under the 15-day testing warranty.",
       },
       {
         question: "Are in-store purchases returnable?",
         answer:
-          "No. As printed on the invoice, goods sold in store are not returnable. In-store purchases are covered by the 15-day testing warranty, which provides repair or replacement — not a refund.",
+          "No. As printed on the invoice, goods sold cannot be taken back as a return. Your 15-day testing warranty provides repair, exchange or replacement — not a refund.",
       },
       {
         question: "How long does a refund take?",

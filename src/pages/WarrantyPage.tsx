@@ -17,7 +17,7 @@ interface WarrantyItem {
   purchased_on: string;
   delivered_on: string | null;
   warranty_period: string;
-  status: "active" | "expired" | "not_started" | "cancelled";
+  status: "active" | "expired" | "not_started" | "cancelled" | "no_warranty";
   warranty_until: string | null;
   days_left: number | null;
   replacement_until: string | null;
@@ -32,6 +32,7 @@ const STATUS = {
   expired: { label: "Warranty expired", cls: "bg-destructive/10 text-destructive", icon: ShieldX },
   not_started: { label: "Starts on delivery", cls: "bg-brand-sky/15 text-sky-700", icon: CalendarCheck },
   cancelled: { label: "Order cancelled", cls: "bg-muted text-muted-foreground", icon: ShieldX },
+  no_warranty: { label: "Sold without warranty", cls: "bg-muted text-muted-foreground", icon: ShieldX },
 };
 
 const inputClass =
@@ -67,7 +68,7 @@ const WarrantyPage = () => {
     <>
       <SEO
         title="Check Laptop Warranty | Yuva Computers"
-        description="Check the warranty and 15-day replacement status of a laptop bought from Yuva Computers, using your phone number or serial number."
+        description="Check the warranty and testing warranty status of a laptop bought from Yuva Computers, using your phone number or serial number."
         canonical="/warranty"
       />
       <PageHero
@@ -170,7 +171,7 @@ const WarrantyPage = () => {
                     <dd className="font-semibold">{fmt(w.delivered_on)}</dd>
                   </div>
                   <div className="rounded-2xl bg-muted/60 p-4">
-                    <dt className="text-muted-foreground">Parts warranty until</dt>
+                    <dt className="text-muted-foreground">{w.warranty_period} until</dt>
                     <dd className="font-semibold">
                       {fmt(w.warranty_until)}
                       {w.status === "active" && w.days_left !== null && (
@@ -179,9 +180,9 @@ const WarrantyPage = () => {
                     </dd>
                   </div>
                   <div className="rounded-2xl bg-muted/60 p-4">
-                    <dt className="text-muted-foreground">Testing warranty (replacement)</dt>
+                    <dt className="text-muted-foreground">Testing warranty</dt>
                     <dd className="font-semibold">
-                      {w.replacement_until ? (w.replacement_open ? `Open until ${fmt(w.replacement_until)}` : "Closed") : "Starts on delivery"}
+                      {w.status === "no_warranty" ? "Not included" : w.replacement_until ? (w.replacement_open ? `Open until ${fmt(w.replacement_until)}` : "Closed") : "Starts on delivery"}
                     </dd>
                   </div>
                 </dl>

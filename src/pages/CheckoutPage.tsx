@@ -649,6 +649,10 @@ export default function CheckoutPage() {
                     <span className="text-primary mt-0.5">•</span>
                     Replacement must be equal or higher value
                   </li>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-primary mt-0.5">•</span>
+                    Record a video while opening the package — needed for any transit-damage claim
+                  </li>
                 </ul>
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
@@ -658,7 +662,10 @@ export default function CheckoutPage() {
                     className="mt-0.5 accent-primary"
                   />
                   <span className="text-xs text-foreground font-medium leading-relaxed">
-                    I accept the return & exchange policy
+                    I accept the{" "}
+                    <a href="/returns-refund-policy" target="_blank" rel="noopener noreferrer" className="underline">return & exchange policy</a>{" "}
+                    and{" "}
+                    <a href="/warranty-policy" target="_blank" rel="noopener noreferrer" className="underline">warranty policy</a>
                   </span>
                 </label>
               </div>
