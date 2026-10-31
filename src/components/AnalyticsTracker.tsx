@@ -1,25 +1,35 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import { trackContact, trackPageView } from "@/lib/track";
 
-// Extend window interface to avoid TypeScript errors for window.gtag
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-  }
-}
-
-const MEASUREMENT_ID = "G-KNYK3K7872";
-
+/**
+ * Google Analytics counts page changes itself (GA4 enhanced measurement:
+ * "Page changes based on browser history events"), and index.html records
+ * the first page for both tags. This adds the Meta PageView for later pages
+ * and records WhatsApp / phone taps anywhere on the site.
+ */
 export default function AnalyticsTracker() {
   const location = useLocation();
+  const first = useRef(true);
 
   useEffect(() => {
-    if (typeof window.gtag === "function") {
-      window.gtag("config", MEASUREMENT_ID, {
-        page_path: location.pathname + location.search,
-      });
+    if (first.current) {
+      first.current = false;
+      return;
     }
-  }, [location]);
+    trackPageView();
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement | null)?.closest?.("a");
+      const href = link?.getAttribute("href") || "";
+      if (/^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href)) trackContact("whatsapp", window.location.pathname);
+      else if (href.startsWith("tel:")) trackContact("phone", window.location.pathname);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, []);
 
   return null;
 }

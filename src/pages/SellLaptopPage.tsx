@@ -9,6 +9,7 @@ import { whatsappLink } from "@/lib/site";
 import {
   BRANDS, CONDITIONS, GENERATIONS, PROCESSORS, RAM_OPTIONS, STORAGE_OPTIONS, estimateTradeIn,
 } from "@/lib/tradein";
+import { trackLead } from "@/lib/track";
 
 const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
@@ -106,6 +107,7 @@ const SellLaptopPage = () => {
     try {
       await engageService.submitTradeIn(form);
       setDone(true);
+      trackLead("trade_in", estimate?.low);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
       const msg = err?.phone?.[0] || err?.error || err?.detail || "Couldn't send your request. Please try again or WhatsApp us.";

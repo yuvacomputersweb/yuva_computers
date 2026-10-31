@@ -7,6 +7,7 @@ import { type ApiProduct, collectVariantValues } from "@/types/product";
 import { SEO } from "@/components/SEO";
 import { BUDGET_RANGES, budgetHref, whatsappLink } from "@/lib/site";
 import { normalizeProcessor, normalizeSize, isPlaceholderSpec } from "@/lib/specs";
+import { trackSearch } from "@/lib/track";
 
 
 const NORMALIZERS: Record<string, (v: string) => string> = {
@@ -89,6 +90,11 @@ const ProductsPage = () => {
   const [priceRange, setPriceRange] = useState(1000000);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [sortBy, setSortBy] = useState("newest");
+
+  const searchTerm = searchParams.get("search") || "";
+  useEffect(() => {
+    if (searchTerm) trackSearch(searchTerm);
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchProducts = async () => {
