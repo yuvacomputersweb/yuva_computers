@@ -86,86 +86,74 @@ export default function ProductInfo({
     [...new Set(arr)].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
 
-  // ── Determine whether variants use processor field ─────────────
+  // ── Options, picked in order: processor → version → RAM → storage ──
+  // Processor and version (Touch, Metal…) are physically different laptops;
+  // RAM and storage are upgraded to order.
   const hasProcessorVariants = useMemo(
     () => variants.some((v) => v.processor && v.processor.trim() !== ""),
     [variants]
   );
-
-
-  // ── Step 1: Processor options (SORTED) ─────────────────────────
-  const processorOptions = useMemo(() => {
-    if (!hasProcessorVariants) return [];
-    return sortValues(variants.map((v) => v.processor).filter(Boolean));
-  }, [variants, hasProcessorVariants]);
-
-
-  const [selectedProcessor, setSelectedProcessor] = useState<string>(
-    processorOptions[0] || ""
+  const hasEditionVariants = useMemo(
+    () => variants.some((v) => v.edition && v.edition.trim() !== ""),
+    [variants]
   );
 
-
-  // ── Step 2: RAM options (SORTED) ───────────────────────────────
-  const ramOptions = useMemo(() => {
-    const source = hasProcessorVariants
-      ? variants.filter((v) => v.processor === selectedProcessor)
-      : variants;
-
-    return sortValues(source.map((v) => v.ram));
-  }, [variants, selectedProcessor, hasProcessorVariants]);
-
-
-  const [selectedRam, setSelectedRam] = useState<string>(
-    ramOptions[0] || ""
+  const processorOptions = useMemo(
+    () => (hasProcessorVariants ? sortValues(variants.map((v) => v.processor).filter(Boolean)) : []),
+    [variants, hasProcessorVariants]
   );
+  const [selectedProcessor, setSelectedProcessor] = useState<string>(processorOptions[0] || "");
 
+  const matchesProcessor = (v: any) => !hasProcessorVariants || v.processor === selectedProcessor;
 
-  // ── Step 3: Storage options (SORTED) ───────────────────────────
-  const storageOptions = useMemo(() => {
-    const source = hasProcessorVariants
-      ? variants.filter(
-          (v) => v.processor === selectedProcessor && v.ram === selectedRam
-        )
-      : variants.filter((v) => v.ram === selectedRam);
-
-    return sortValues(source.map((v) => v.storage));
-  }, [variants, selectedProcessor, selectedRam, hasProcessorVariants]);
-
-
-  const [selectedStorage, setSelectedStorage] = useState<string>(
-    storageOptions[0] || ""
+  const editionOptions = useMemo(
+    () => (hasEditionVariants ? sortValues(variants.filter(matchesProcessor).map((v) => v.edition || "Standard")) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [variants, selectedProcessor, hasEditionVariants]
   );
+  const [selectedEdition, setSelectedEdition] = useState<string>(editionOptions[0] || "");
 
+  const matchesEdition = (v: any) => !hasEditionVariants || (v.edition || "Standard") === selectedEdition;
 
-  // ── Cascade fixes ───────────────────────────────────────────────
+  const ramOptions = useMemo(
+    () => sortValues(variants.filter((v) => matchesProcessor(v) && matchesEdition(v)).map((v) => v.ram)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [variants, selectedProcessor, selectedEdition]
+  );
+  const [selectedRam, setSelectedRam] = useState<string>(ramOptions[0] || "");
+
+  const storageOptions = useMemo(
+    () =>
+      sortValues(
+        variants.filter((v) => matchesProcessor(v) && matchesEdition(v) && v.ram === selectedRam).map((v) => v.storage)
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [variants, selectedProcessor, selectedEdition, selectedRam]
+  );
+  const [selectedStorage, setSelectedStorage] = useState<string>(storageOptions[0] || "");
+
+  // ── Keep each choice valid when an earlier one changes ──────────
   useEffect(() => {
-    if (ramOptions.length > 0 && !ramOptions.includes(selectedRam)) {
-      setSelectedRam(ramOptions[0]);
-    }
-  }, [selectedProcessor, ramOptions]);
-
+    if (editionOptions.length > 0 && !editionOptions.includes(selectedEdition)) setSelectedEdition(editionOptions[0]);
+  }, [editionOptions, selectedEdition]);
 
   useEffect(() => {
-    if (storageOptions.length > 0 && !storageOptions.includes(selectedStorage)) {
-      setSelectedStorage(storageOptions[0]);
-    }
-  }, [selectedRam, storageOptions]);
+    if (ramOptions.length > 0 && !ramOptions.includes(selectedRam)) setSelectedRam(ramOptions[0]);
+  }, [ramOptions, selectedRam]);
 
+  useEffect(() => {
+    if (storageOptions.length > 0 && !storageOptions.includes(selectedStorage)) setSelectedStorage(storageOptions[0]);
+  }, [storageOptions, selectedStorage]);
 
   // ── Active variant ──────────────────────────────────────────────
-  const activeVariant = useMemo(() => {
-    if (hasProcessorVariants) {
-      return variants.find(
-        (v) =>
-          v.processor === selectedProcessor &&
-          v.ram === selectedRam &&
-          v.storage === selectedStorage
-      );
-    }
-    return variants.find(
-      (v) => v.ram === selectedRam && v.storage === selectedStorage
-    );
-  }, [variants, selectedProcessor, selectedRam, selectedStorage, hasProcessorVariants]);
+  const activeVariant = useMemo(
+    () =>
+      variants.find(
+        (v) => matchesProcessor(v) && matchesEdition(v) && v.ram === selectedRam && v.storage === selectedStorage
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [variants, selectedProcessor, selectedEdition, selectedRam, selectedStorage]
+  );
 
 
   useEffect(() => {
@@ -249,7 +237,7 @@ export default function ProductInfo({
     currentStock === 0 ? "text-destructive" : currentStock <= 3 ? "text-orange-600" : "text-brand-leaf-dark";
 
   const askText = `Hi Yuva Computers, I'm interested in ${product.title}${
-    activeVariant ? ` (${[activeVariant.processor, activeVariant.ram, activeVariant.storage].filter(Boolean).join(" / ")})` : ""
+    activeVariant ? ` (${[activeVariant.processor, activeVariant.edition, activeVariant.ram, activeVariant.storage].filter(Boolean).join(" / ")})` : ""
   }. Is it available?`;
 
 
@@ -366,6 +354,9 @@ export default function ProductInfo({
           {hasProcessorVariants && processorOptions.length > 1 && (
             <OptionGroup label="Processor" options={processorOptions} selected={selectedProcessor} onSelect={setSelectedProcessor} />
           )}
+          {hasEditionVariants && editionOptions.length > 0 && (
+            <OptionGroup label="Version" options={editionOptions} selected={selectedEdition} onSelect={setSelectedEdition} />
+          )}
           {!(ramOptions.length === 1 && isPlaceholderSpec(ramOptions[0])) && (
             <OptionGroup label="RAM" options={ramOptions} selected={selectedRam} onSelect={setSelectedRam} />
           )}
@@ -426,7 +417,7 @@ export default function ProductInfo({
           key={activeVariant?.id ?? "product"}
           productId={product.id}
           variantId={activeVariant?.id}
-          label={activeVariant ? [activeVariant.processor, activeVariant.ram, activeVariant.storage].filter(Boolean).join(" / ") : undefined}
+          label={activeVariant ? [activeVariant.processor, activeVariant.edition, activeVariant.ram, activeVariant.storage].filter(Boolean).join(" / ") : undefined}
         />
       )}
 

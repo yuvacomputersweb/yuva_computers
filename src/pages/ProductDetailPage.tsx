@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { ChevronRight, ArrowRight, PackageSearch } from "lucide-react";
 import { storeService } from "@/services/api";
@@ -23,6 +23,7 @@ import { productItem, trackViewItem } from "@/lib/track";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [related, setRelated] = useState<any[]>([]);
@@ -33,6 +34,11 @@ export default function ProductDetailPage() {
       setLoading(true);
       try {
         const data = await storeService.getProductBySlug(slug!);
+        if (data?.redirect_to) {
+          // This listing was combined into another product (pick processor / version there).
+          navigate(`/product/${data.redirect_to}`, { replace: true });
+          return;
+        }
         setProduct(data);
         trackViewItem(productItem(data));
         const rel = await storeService.getProducts({ category: data.category_name?.toLowerCase() });
