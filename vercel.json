@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/feeds/products.xml",
+      "destination": "https://api.yuvacomputers.in/api/store/feeds/products.xml"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
