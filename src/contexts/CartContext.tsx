@@ -18,6 +18,8 @@ interface CartItem {
   stock: number;
   /** Windows laptops share one count per model across RAM/SSD options. */
   sharedStock?: boolean;
+  /** Lines with the same group sell from one stock count. */
+  stockGroup?: string;
   variant?: string;       // Display label: "i5 / 8GB / 256GB SSD"
   variantId?: number;
   productId: number;
@@ -96,7 +98,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     // UPDATED: cart item ID now includes processor for proper merging isolation
     // Format: productId-processor-ram-storage  (processor may be empty string)
     const id = variant
-      ? `${product.id}-${variant.processor || ""}-${variant.ram}-${variant.storage}`
+      ? `${product.id}-${variant.processor || ""}-${variant.edition || ""}-${variant.ram}-${variant.storage}`
       : String(product.id);
 
     const stock = variant ? variant.stock : product.stock || 0;
@@ -112,6 +114,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (variant) {
       const parts: string[] = [];
       if (variant.processor) parts.push(variant.processor);
+      if (variant.edition) parts.push(variant.edition);
       if (variant.ram) parts.push(variant.ram);
       if (variant.storage) parts.push(variant.storage);
       variantLabel = parts.join(" / ");
@@ -121,10 +124,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     setItems((prev) => {
       const existing = prev.find((item) => item.id === id);
-      const shared = product.stock_mode === "model";
-      // Shared model stock: count every configuration of this model already in the cart.
+      // Shared stock: the whole model ('model'), or one processor + version ('type').
+      const group =
+        product.stock_mode === "model" ? `${product.id}`
+        : product.stock_mode === "type" ? `${product.id}|${variant?.processor || ""}|${variant?.edition || ""}`
+        : "";
+      const shared = !!group;
       const currentQty = shared
-        ? prev.filter((item) => item.productId === product.id).reduce((n, item) => n + item.quantity, 0)
+        ? prev.filter((item) => item.stockGroup === group).reduce((n, item) => n + item.quantity, 0)
         : existing ? existing.quantity : 0;
 
       if (currentQty + quantity <= stock) {
@@ -150,6 +157,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             quantity,
             stock,
             sharedStock: shared,
+            stockGroup: group || undefined,
             variant: variantLabel,
             variantId: variant?.id ?? null,
             processor: variant?.processor ?? undefined,
@@ -170,7 +178,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       const item = prev.find((i) => i.id === id);
       if (!item) return prev;
       const others = item.sharedStock
-        ? prev.filter((i) => i.productId === item.productId && i.id !== id).reduce((n, i) => n + i.quantity, 0)
+        ? prev
+            .filter((i) => i.id !== id && (i.stockGroup ? i.stockGroup === item.stockGroup : i.productId === item.productId))
+            .reduce((n, i) => n + i.quantity, 0)
         : 0;
       if (quantity + others > item.stock) return prev;
       if (quantity <= 0) return prev.filter((i) => i.id !== id);

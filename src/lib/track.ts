@@ -63,7 +63,7 @@ export const productItem = (product: any, variant?: any, quantity = 1): TrackIte
   name: product.title,
   brand: product.brand_name,
   category: product.category_name,
-  variant: variant ? [variant.processor, variant.ram, variant.storage].filter(Boolean).join(" / ") : undefined,
+  variant: variant ? [variant.processor, variant.edition, variant.ram, variant.storage].filter(Boolean).join(" / ") : undefined,
   price: Number(variant?.final_price ?? product.price) || 0,
   quantity,
 });
