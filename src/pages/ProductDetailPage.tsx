@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/accordion";
 import { FAQ_SECTIONS } from "@/data/faqs";
 import { SEO } from "@/components/SEO";
+import { productItem, trackViewItem } from "@/lib/track";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -33,6 +34,7 @@ export default function ProductDetailPage() {
       try {
         const data = await storeService.getProductBySlug(slug!);
         setProduct(data);
+        trackViewItem(productItem(data));
         const rel = await storeService.getProducts({ category: data.category_name?.toLowerCase() });
         setRelated(rel.filter((p: any) => p.id !== data.id));
       } catch {

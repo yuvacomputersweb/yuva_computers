@@ -5,6 +5,7 @@ import { submitBulkOrder, contentService } from "@/services/api";
 import { SEO } from "@/components/SEO";
 import PageHero from "@/components/PageHero";
 import { SITE, whatsappLink } from "@/lib/site";
+import { trackLead } from "@/lib/track";
 
 const ICON_MAP: Record<string, any> = {
   truck: Truck, settings: Settings, shield: Shield,
@@ -111,6 +112,7 @@ const BulkOrdersPage = () => {
         quantity: qty, requirements: form.requirements,
       });
       toast.success(res.data.detail);
+      trackLead("bulk_order");
       setForm({ name: "", company: "", email: "", phone: "", deviceType: "Laptops", deviceTypeOther: "", quantity: "", requirements: "" });
     } catch (err: any) {
       const errors = err?.response?.data;

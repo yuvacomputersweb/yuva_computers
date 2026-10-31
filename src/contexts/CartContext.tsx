@@ -21,6 +21,8 @@ interface CartItem {
   variant?: string;       // Display label: "i5 / 8GB / 256GB SSD"
   variantId?: number;
   productId: number;
+  /** Product code; matches the ad / Shopping product feed. */
+  sku?: string;
   // Individual variant fields stored for order payload / merging logic
   processor?: string;
   ram?: string;
@@ -141,6 +143,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           {
             id,
             productId: product.id,
+            sku: product.sku,
             name: product.title,
             price,
             image,

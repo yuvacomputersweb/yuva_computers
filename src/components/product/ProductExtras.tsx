@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { engageService, type Offer, type PincodeResult } from "@/services/api";
 import { lines, useSiteConfig } from "@/lib/siteConfig";
+import { trackLead } from "@/lib/track";
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
@@ -288,6 +289,7 @@ export function NotifyMe({ productId, variantId, label }: { productId: number; v
     try {
       await engageService.createStockAlert({ product: productId, variant: variantId, phone });
       setDone(true);
+      trackLead("back_in_stock");
     } catch (err: any) {
       toast.error(err?.error || "Couldn't save your request. Please try again.");
     } finally {

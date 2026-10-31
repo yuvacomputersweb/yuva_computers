@@ -1,5 +1,5 @@
 // CheckoutPage.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Loader2, Tag, X, ChevronRight, ShieldCheck,
@@ -11,6 +11,7 @@ import { orderService, storeService } from "@/services/api";
 import { toast } from "sonner";
 import AddressManager from "@/components/profile/AddressManager";
 import { SEO } from "@/components/SEO";
+import { metaCookies, trackBeginCheckout, trackPurchase, type TrackItem } from "@/lib/track";
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
@@ -80,6 +81,23 @@ const COD_GST_PCT = 18;
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
+
+  // Cart lines in the shape the ad / analytics tags expect.
+  const trackItems: TrackItem[] = items.map((i) => ({
+    id: String(i.sku || i.productId),
+    name: i.name,
+    variant: i.variant,
+    price: i.price,
+    quantity: i.quantity,
+  }));
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (!checkoutTracked.current && trackItems.length) {
+      checkoutTracked.current = true;
+      trackBeginCheckout(trackItems);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
   const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
@@ -249,6 +267,7 @@ export default function CheckoutPage() {
         state:                  selectedAddress.state,
         zip_code:               selectedAddress.zip_code,
         country:                selectedAddress.country ?? "India",
+        tracking:               metaCookies(),
       };
 
       const data = await orderService.createOrder(orderPayload) as CheckoutResponse;
@@ -279,6 +298,7 @@ export default function CheckoutPage() {
               razorpay_signature:  response.razorpay_signature,
             }) as VerifyResponse;
 
+            trackPurchase(data.order_id, trackItems, total, paymentMethod);
             clearCart();
 
             if (isCOD) {

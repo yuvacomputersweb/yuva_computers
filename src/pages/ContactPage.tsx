@@ -6,6 +6,7 @@ import { submitContactForm, submitComplaint, contentService } from "@/services/a
 import { SEO } from "@/components/SEO";
 import PageHero from "@/components/PageHero";
 import { SITE, SOCIAL_LINKS } from "@/lib/site";
+import { trackLead } from "@/lib/track";
 
 const ICON_MAP: Record<string, any> = {
   wrench: Wrench,
@@ -113,6 +114,7 @@ const ContactPage = () => {
         message: form.message,
       });
       toast.success(res.data.detail);
+      trackLead("contact_form");
       setForm({ name: "", email: "", phone: "", orderId: "", issueType: "Technical Assistance", issueTypeOther: "", message: "" });
     } catch (err: any) {
       toast.error(err?.response?.data?.detail || "Something went wrong. Please try again.");

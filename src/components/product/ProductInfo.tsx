@@ -9,6 +9,7 @@ import { whatsappLink } from "@/lib/site";
 import { isPlaceholderSpec } from "@/lib/specs";
 import { Link } from "react-router-dom";
 import { EmiLine, OffersList, InTheBox, DeliveryEstimate, NotifyMe } from "./ProductExtras";
+import { productItem, trackAddToCart } from "@/lib/track";
 
 const conditionStyles: Record<string, string> = {
   like_new: "bg-brand-leaf/15 text-brand-leaf-dark",
@@ -188,6 +189,7 @@ export default function ProductInfo({
 
   const handleAddToCart = () => {
     const success = addToCart(product, quantity, activeVariant);
+    if (success) trackAddToCart(productItem(product, activeVariant, quantity));
     if (success) toast.success("Added to cart!");
     else toast.error("Not enough stock available.");
   };
@@ -195,6 +197,7 @@ export default function ProductInfo({
 
   const handleBuyNow = () => {
     const success = addToCart(product, quantity, activeVariant);
+    if (success) trackAddToCart(productItem(product, activeVariant, quantity));
     if (success) navigate("/checkout");
     else toast.error("Product out of stock.");
   };
